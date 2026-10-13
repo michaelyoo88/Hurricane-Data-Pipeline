@@ -1,0 +1,79 @@
+"""Column documentation for final/. Key: (table, column) or ("*", column) for
+columns shared by several tables. Value: (unit, description, source)."""
+U = "USD (2023, CPI-U)"
+NRI = "FEMA NRI county table"
+NYF = "NY Fed Losses from Natural Disasters (Housing weights), matched to storms in step 05"
+NYP = "NY Fed Losses from Natural Disasters (Population weights), matched to storms in step 05"
+HUR = "NOAA HURDAT2"
+
+DESCRIPTIONS = {
+    # shared keys
+    ("*", "storm_id"): ("", "Storm identifier: basin + number + year, e.g. AL092022 = Ian", HUR),
+    ("*", "fips"): ("", "5-character state + county FIPS code (text, keep leading zero)", NRI),
+    ("*", "year"): ("", "Storm season year", HUR),
+    ("*", "has_labels"): ("", "True if the year has NY Fed loss data (1996-2025); loss columns are blank when False", "derived"),
+    # storm_county (fact)
+    ("storm_county", "month"): ("", "Month of the storm's closest approach to the county", HUR),
+    ("storm_county", "min_dist_km"): ("km", "Closest distance from the storm center to the county's center of population", "derived (haversine)"),
+    ("storm_county", "vmax_at_min_ms"): ("m/s", "Storm maximum sustained wind at the hour of closest approach", HUR),
+    ("storm_county", "vmax_peak_100km_ms"): ("m/s", "Highest storm maximum wind while the center was within 100 km; blank if never within 100 km", HUR),
+    ("storm_county", "hours_within_100km"): ("hours", "Hours the storm center spent within 100 km of the county", "derived"),
+    ("storm_county", "time_at_min_utc"): ("UTC", "Time of closest approach", HUR),
+    ("storm_county", "enter_500km_utc"): ("UTC", "First hour the storm center was within 500 km", HUR),
+    ("storm_county", "exit_500km_utc"): ("UTC", "Last hour the storm center was within 500 km", HUR),
+    ("storm_county", "prop_dmg_usd2023"): (U, "Observed property damage; 0 = labeled year with no record", NYF),
+    ("storm_county", "crop_dmg_usd2023"): (U, "Observed crop damage; 0 = labeled year with no record", NYF),
+    ("storm_county", "crop_dmg_area_usd2023"): (U, "Crop damage split across counties by land area instead of housing (sensitivity check)", NYF.replace("Housing", "Area")),
+    ("storm_county", "deaths_direct"): ("people", "Direct deaths (fractional where a zone's count was split across counties)", NYP),
+    ("storm_county", "deaths_indirect"): ("people", "Indirect deaths", NYP),
+    ("storm_county", "injuries_direct"): ("people", "Direct injuries", NYP),
+    ("storm_county", "injuries_indirect"): ("people", "Indirect injuries", NYP),
+    ("storm_county", "n_loss_records"): ("count", "NY Fed records summed into this row", "derived"),
+    ("storm_county", "n_ambiguous_records"): ("count", "Of those, records where another storm also qualified (closest storm chosen)", "derived"),
+    # storms (dimension)
+    ("storms", "name"): ("", "Storm name (UNNAMED for some)", HUR),
+    ("storms", "start_utc"): ("UTC", "First best-track time", HUR),
+    ("storms", "end_utc"): ("UTC", "Last best-track time", HUR),
+    ("storms", "peak_vmax_ms"): ("m/s", "Lifetime maximum sustained wind", HUR),
+    ("storms", "min_pmin_mb"): ("mb", "Lifetime minimum central pressure", HUR),
+    ("storms", "peak_category"): ("", "Saffir-Simpson category at peak (TD, TS, 1-5)", "derived"),
+    ("storms", "n_counties_500km"): ("count", "Counties whose center came within 500 km of the storm center", "derived"),
+    ("storms", "n_counties_100km"): ("count", "Counties whose center came within 100 km", "derived"),
+    ("storms", "closest_county_km"): ("km", "Closest approach to any county; blank if never within 500 km", "derived"),
+    ("storms", "obs_prop_dmg_usd2023"): (U, "Total matched property damage, all counties", NYF),
+    ("storms", "obs_crop_dmg_usd2023"): (U, "Total matched crop damage, all counties", NYF),
+    ("storms", "obs_deaths_direct"): ("people", "Total matched direct deaths", NYP),
+    # counties (dimension)
+    ("counties", "state"): ("", "State abbreviation", NRI),
+    ("counties", "county_name"): ("", "County name (Connecticut: 2022 planning regions)", NRI),
+    ("counties", "pop_lat"): ("degrees", "Latitude of the 2020 center of population (Connecticut: estimated from old counties)", "Census 2020 Centers of Population"),
+    ("counties", "pop_lon"): ("degrees", "Longitude of the 2020 center of population", "Census 2020 Centers of Population"),
+    ("counties", "population"): ("people", "2020 population", NRI),
+    ("counties", "bldg_value_usd2023"): (U, "Total building value (exposure)", NRI),
+    ("counties", "ag_value_usd2023"): (U, "Agriculture value (exposure)", NRI),
+    ("counties", "area_sqmi"): ("sq mi", "Land area", NRI),
+    ("counties", "density_per_sqmi"): ("people/sq mi", "Population / area", "derived"),
+    ("counties", "coastal"): ("", "True if NRI Coastal Flooding expected annual loss > 0", NRI),
+    ("counties", "nri_hrcn_n_events"): ("count", "FEMA: recorded hurricane events", NRI),
+    ("counties", "nri_hrcn_afreq"): ("events/yr", "FEMA: hurricane annualized frequency (F)", NRI),
+    ("counties", "nri_hrcn_exp_bldg_usd2023"): (U, "FEMA: building value exposed to hurricanes (X_B)", NRI),
+    ("counties", "nri_hrcn_exp_pop"): ("people", "FEMA: population exposed (X_P)", NRI),
+    ("counties", "nri_hrcn_exp_ag_usd2023"): (U, "FEMA: agriculture value exposed (X_A)", NRI),
+    ("counties", "nri_hrcn_hlr_bldg"): ("fraction", "FEMA: historic loss ratio, buildings (HLR_B)", NRI),
+    ("counties", "nri_hrcn_hlr_pop"): ("fraction", "FEMA: historic loss ratio, population (HLR_P)", NRI),
+    ("counties", "nri_hrcn_hlr_ag"): ("fraction", "FEMA: historic loss ratio, agriculture (HLR_A)", NRI),
+    ("counties", "nri_hrcn_eal_bldg_usd2023"): (U + "/yr", "FEMA: expected annual loss, buildings", NRI),
+    ("counties", "nri_hrcn_eal_pop"): ("people/yr", "FEMA: expected annual fatalities (injuries counted /10)", NRI),
+    ("counties", "nri_hrcn_eal_pope_usd2023"): (U + "/yr", "FEMA: population loss in dollars (VSL $11.6M)", NRI),
+    ("counties", "nri_hrcn_eal_ag_usd2023"): (U + "/yr", "FEMA: expected annual loss, agriculture", NRI),
+    ("counties", "nri_hrcn_eal_total_usd2023"): (U + "/yr", "FEMA: total hurricane EAL - the benchmark to beat", NRI),
+    ("counties", "nri_hrcn_eal_score"): ("percentile", "FEMA: national percentile of hurricane EAL", NRI),
+    ("counties", "nri_hrcn_eal_rating"): ("", "FEMA: hurricane EAL rating (Very Low to Very High)", NRI),
+    # storm_tracks (detail)
+    ("storm_tracks", "time_utc"): ("UTC", "Hour (linear interpolation of 6-hourly best track)", HUR),
+    ("storm_tracks", "lat"): ("degrees", "Storm center latitude", HUR),
+    ("storm_tracks", "lon"): ("degrees", "Storm center longitude (west negative)", HUR),
+    ("storm_tracks", "vmax_ms"): ("m/s", "Maximum sustained wind", HUR),
+    ("storm_tracks", "pmin_mb"): ("mb", "Minimum central pressure (blank where never recorded)", HUR),
+    ("storm_tracks", "status"): ("", "Storm type: HU hurricane, TS tropical storm, TD depression, EX extratropical, etc.", HUR),
+}
