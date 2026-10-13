@@ -68,3 +68,23 @@ storm_tracks,lon,float64,degrees,Storm center longitude (west negative),NOAA HUR
 storm_tracks,vmax_ms,float64,m/s,Maximum sustained wind,NOAA HURDAT2,0.0
 storm_tracks,pmin_mb,float64,mb,Minimum central pressure (blank where never recorded),NOAA HURDAT2,6.3
 storm_tracks,status,object,,"Storm type: HU hurricane, TS tropical storm, TD depression, EX extratropical, etc.",NOAA HURDAT2,0.0
+county_year,fips,object,,"5-character state + county FIPS code (text, keep leading zero)",FEMA NRI county table,0.0
+county_year,state,object,,State abbreviation,FEMA NRI county table,0.0
+county_year,county_name,object,,County name (Connecticut: 2022 planning regions),FEMA NRI county table,0.0
+county_year,year,int64,,Calendar year of the hurricane season,NOAA HURDAT2,0.0
+county_year,has_labels,bool,,True if the year has NY Fed loss data (1996-2025); loss columns are blank when False,derived,0.0
+county_year,max_wind_ms,float64,m/s,Strongest estimated wind from any storm that year (Rankine vortex at closest approach); 0 if no storm within 500 km,derived from NOAA HURDAT2,0.0
+county_year,hurricane_hit,bool,,"True if max_wind_ms >= 32.9 m/s (64 kt, hurricane force)",derived,0.0
+county_year,ts_hit,bool,,"True if max_wind_ms >= 17.5 m/s (34 kt, tropical-storm force)",derived,0.0
+county_year,n_storms_500km,int64,count,Storms whose center passed within 500 km that year,derived,0.0
+county_year,n_storms_ts_force,int64,count,Storms bringing tropical-storm-force wind that year,derived,0.0
+county_year,n_storms_hurricane_force,int64,count,Storms bringing hurricane-force wind that year,derived,0.0
+county_year,p_hurricane_hit,float64,probability,Share of years 1975-2025 with a hurricane-force hit (same value every year for a county),derived,0.0
+county_year,p_ts_hit,float64,probability,Share of years 1975-2025 with tropical-storm-force wind,derived,0.0
+county_year,mean_hurricanes_per_yr,float64,storms/yr,"Average hurricane-force storms per year, 1975-2025 (comparable to FEMA annualized frequency)",derived,0.0
+county_year,prop_dmg_usd2023,float64,"USD (2023, CPI-U)","Recorded property damage that year, all storms; blank before 1996","NY Fed Losses from Natural Disasters (Housing weights), matched to storms in step 05",41.2
+county_year,crop_dmg_usd2023,float64,"USD (2023, CPI-U)","Recorded crop damage that year, all storms; blank before 1996","NY Fed Losses from Natural Disasters (Housing weights), matched to storms in step 05",41.2
+county_year,total_dmg_usd2023,float64,"USD (2023, CPI-U)",Property + crop damage,"NY Fed Losses from Natural Disasters (Housing weights), matched to storms in step 05",41.2
+county_year,deaths_direct,float64,people,Recorded direct deaths that year,"NY Fed Losses from Natural Disasters (Population weights), matched to storms in step 05",41.2
+county_year,injuries_direct,float64,people,Recorded direct injuries that year,"NY Fed Losses from Natural Disasters (Population weights), matched to storms in step 05",41.2
+county_year,pop_loss_usd2023,float64,USD,(deaths + injuries/10) x $13.7M value of a statistical life (FEMA NRI v1.20),derived,41.2

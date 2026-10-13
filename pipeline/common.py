@@ -38,6 +38,16 @@ WEIGHT_SENSITIVITY = "Area"     # crop damage, sensitivity check only
 
 KT_TO_MS = 0.514444
 
+# --- County x year table (step 08) -------------------------------------------
+# Wind at a county = simple modified Rankine vortex at the storm's closest approach:
+#   V = Vmax                         if distance <= RMW_KM
+#   V = Vmax * (RMW_KM / d) ** 0.5   otherwise
+RMW_KM = 40.0              # radius of maximum wind, same for every storm (assumption)
+RANKINE_EXP = 0.5          # how fast wind fades with distance (assumption)
+HURRICANE_MS = 32.9        # 64 kt: hurricane-force wind = a "hit"
+TROPICAL_STORM_MS = 17.5   # 34 kt: tropical-storm-force wind
+VSL_USD = 13.7e6           # FEMA NRI v1.20 value of a statistical life; 10 injuries = 1 death
+
 
 class StepLog:
     """Prints progress and saves the same lines to clean/logs/<step>.txt."""

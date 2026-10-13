@@ -30,6 +30,7 @@ storms = load("storms")     # any single table
 | `storm_county.csv` | storm x county within 500 km | `storm_id` + `fips` | 164,592 | **Fact**: closest approach, storm strength, observed losses |
 | `storms.csv` | storm, 1975-2025 | `storm_id` | 839 | Dimension: name, peak strength, category, totals |
 | `counties.csv` | county (contiguous 48 + DC) | `fips` | 3,109 | Dimension: location, exposure, FEMA NRI hurricane benchmark |
+| `county_year.csv` | county x year, 1975-2025 | `fips` + `year` | 158,559 | **Minimum modeling table**: max wind, hurricane hit, annual hit probability, damage |
 | `storm_tracks.csv` | storm x hour | `storm_id` + `time_utc` | 133,061 | Detail: for upgrading the wind formula later |
 | `data_dictionary.csv` | column | `table` + `column` | 69 | Unit, description, source and % blank for every column |
 
@@ -45,6 +46,7 @@ storms = load("storms")     # any single table
 | 05 loss_match | Each loss record -> closest storm within 500 km during its dates |
 | 06 losses | Matched losses summed per storm x county |
 | 07 final | Publishes `final/`, checks keys and joins, writes the data dictionary |
+| 08 county_year | Collapses storms to one row per county per year; estimates wind (Rankine vortex), hits and hit probability |
 
 ## Rules worth knowing
 

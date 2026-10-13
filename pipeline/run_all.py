@@ -6,7 +6,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 STEPS = ["00_ct_crosswalk.py", "01_counties.py", "02_tracks.py", "03_storm_county.py",
-         "04_loss_records.py", "05_loss_match.py", "06_losses.py", "07_final.py"]
+         "04_loss_records.py", "05_loss_match.py", "06_losses.py", "07_final.py", "08_county_year.py"]
 
 for step in STEPS:
     path = HERE / step
