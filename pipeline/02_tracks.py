@@ -9,15 +9,24 @@ import pandas as pd
 from common import *
 
 log = StepLog("02_tracks")
+# Wind-radii column names: 3 wind speeds x 4 quadrants = 12 names, built with
+# a nested list comprehension (r34_ne_nm, r34_se_nm, ..., r64_nw_nm).
 QUADS = ["ne", "se", "sw", "nw"]
 RADII = [f"r{k}_{q}_nm" for k in (34, 50, 64) for q in QUADS]
 
 
+# Parse one numeric field: blank -> NaN, negative codes (-99 / -999) -> NaN.
 def num(x):
     v = float(x) if x not in ("", None) else np.nan
     return np.nan if v < 0 else v   # HURDAT2 codes missing values as -99 / -999
 
 
+# --- 1. Parse the HURDAT2 text file line by line ---
+# The file alternates: one header line per storm ("AL092022, IAN, ...") then
+# its track lines. A header sets sid / name / year, which stay in effect for
+# the track lines below it. Each track line becomes a dict, and a list of dicts
+# converts neatly into a DataFrame. `with open(...)` closes the file for you.
+# The N/S and E/W letters on lat/lon become + / - signs.
 rows = []
 n_storms_all = 0
 with open(SRC / "hurdat2_atlantic.txt") as fh:
@@ -41,6 +50,7 @@ with open(SRC / "hurdat2_atlantic.txt") as fh:
         row["rmw_nm"] = num(parts[20]) if len(parts) > 20 else np.nan
         rows.append(row)
 
+# --- 2. Build the 6-hourly table, remove duplicates, save ---
 t6 = pd.DataFrame(rows)
 t6["vmax_ms"] = t6["vmax_kt"] * KT_TO_MS
 log.write(f"Storms in file: {n_storms_all}; kept {STORM_YEAR_MIN}-{STORM_YEAR_MAX}: "
@@ -54,6 +64,12 @@ log.write(f"Rows missing pressure: {t6.pmin_mb.isna().mean():.1%}; "
 t6.to_csv(CLEAN / "tracks_6h.csv", index=False)
 
 # Hourly interpolation of position, wind and pressure
+# Best-track points are 6 hours apart and a fast storm moves ~100 km in that
+# time, so whole hours are filled in. For each storm: build an hourly time grid,
+# convert times to integers (int64 nanoseconds) and let np.interp draw straight
+# lines between known points. Wind / pressure use only non-missing points.
+# np.searchsorted finds the last known point at or before each hour, so status
+# (a label, which can't be averaged) is carried forward instead.
 hourly = []
 for sid, g in t6.groupby("storm_id", sort=False):
     h0 = g.time_utc.min().ceil("h")
@@ -74,6 +90,7 @@ for sid, g in t6.groupby("storm_id", sort=False):
     hourly.append(out)
 th = pd.concat(hourly, ignore_index=True)
 
+# --- 3. Sanity checks and save ---
 log.check(th.year.nunique() == STORM_YEAR_MAX - STORM_YEAR_MIN + 1,
           f"{th.year.nunique()} storm seasons present (expect {STORM_YEAR_MAX - STORM_YEAR_MIN + 1})")
 log.check(th.vmax_ms.dropna().between(0, 90).all(),

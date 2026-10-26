@@ -2,8 +2,19 @@
 
 Builds the hurricane modeling dataset from untouched source files.
 
+## Setting up environment
+
 ```
-python3 pipeline/run_all.py        # about 2.5 minutes
+python3 -m venv .venv               # create project venv
+source .venv/bin/activate           # use it (prompt shows (.venv))
+pip install -r requirements.txt     # install pinned libraries
+pip install <pkg>                   # add a new library
+pip freeze > requirements.txt       # save versions after installing
+deactivate                          # back to system Python
+```
+
+```
+python3 pipeline/run_all.py        # run entire data pipeline
 ```
 
 ```python

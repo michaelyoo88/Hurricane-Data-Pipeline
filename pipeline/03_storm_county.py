@@ -8,12 +8,27 @@ import pandas as pd
 from common import *
 
 log = StepLog("03_storm_county")
+# --- 1. Load county centers and hourly tracks ---
+# [None, :] turns the county arrays into (1, n_counties) row vectors so they
+# broadcast against storm positions in the loop below.
 cty = pd.read_csv(CLEAN / "counties.csv", dtype={"fips": str},
                   usecols=["fips", "pop_lat", "pop_lon"])
 tr = pd.read_csv(CLEAN / "tracks_hourly.csv", parse_dates=["time_utc"])
 clat = cty.pop_lat.to_numpy()[None, :]
 clon = cty.pop_lon.to_numpy()[None, :]
 
+# --- 2. For each storm: distance from every hour to every county ---
+# g.lat[:, None] is a column (n_hours, 1) and clat a row (1, n_counties), so
+# haversine broadcasts them into a full n_hours x n_counties distance matrix
+# with no loop over counties. Then, per county column (axis=0):
+#   near        counties the storm ever came within 500 km of (others dropped)
+#   argmin      hour of closest approach -> wind and time at that hour
+#   first/last  first and last hour inside 500 km: argmax on a boolean array
+#               returns the first True; reversing with [::-1] finds the last
+#   close       hours within 100 km; np.where blanks the rest as NaN so nanmax
+#               gives the peak wind while the storm was close
+# Each storm's results become a small DataFrame; all are concatenated once at
+# the end (much faster than appending row by row).
 frames, n_hit = [], 0
 for sid, g in tr.groupby("storm_id", sort=False):
     d = haversine_km(g.lat.to_numpy()[:, None], g.lon.to_numpy()[:, None], clat, clon)
@@ -43,6 +58,8 @@ for sid, g in tr.groupby("storm_id", sort=False):
         "t_enter_500km": times[first],
         "t_exit_500km": times[last],
     }))
+# --- 3. Combine, tidy, check, save ---
+# Counties never within 100 km get a blank peak wind instead of the -1 filler.
 sc = pd.concat(frames, ignore_index=True)
 sc.loc[sc.hours_within_100km == 0, "vmax_peak_within_100km_ms"] = np.nan
 sc["month"] = pd.to_datetime(sc.time_at_min).dt.month

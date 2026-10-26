@@ -1,11 +1,13 @@
 """Column documentation for final/. Key: (table, column) or ("*", column) for
 columns shared by several tables. Value: (unit, description, source)."""
+# Short source labels reused by many entries below.
 U = "USD (2023, CPI-U)"
 NRI = "FEMA NRI county table"
 NYF = "NY Fed Losses from Natural Disasters (Housing weights), matched to storms in step 05"
 NYP = "NY Fed Losses from Natural Disasters (Population weights), matched to storms in step 05"
 HUR = "NOAA HURDAT2"
 
+# Lookup order used by steps 07 / 08: (table, column) first, then ("*", column).
 DESCRIPTIONS = {
     # shared keys
     ("*", "storm_id"): ("", "Storm identifier: basin + number + year, e.g. AL092022 = Ian", HUR),

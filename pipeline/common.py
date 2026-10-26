@@ -9,11 +9,17 @@ import datetime as dt
 import numpy as np
 import pandas as pd
 
+# --- Project paths ---
+# __file__ is this script's own path; .resolve().parents[1] climbs to the
+# project root, so the pipeline works no matter which folder you run it from.
+# Path objects join with `/` (ROOT / "source") instead of string gluing.
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "source"          # raw downloads, never edited
 CLEAN = ROOT / "clean"         # rebuilt by the pipeline
 LOGS = CLEAN / "logs"
 
+# Every step starts with `from common import *`, so each UPPERCASE name below
+# becomes a global constant inside every script.
 # --- Decisions locked Oct 11-12 ---------------------------------------------
 STORM_YEAR_MIN, STORM_YEAR_MAX = 1975, 2025   # storms kept from HURDAT2
 LABEL_YEAR_MIN, LABEL_YEAR_MAX = 1996, 2025   # years with NY Fed loss labels
@@ -49,6 +55,10 @@ TROPICAL_STORM_MS = 17.5   # 34 kt: tropical-storm-force wind
 VSL_USD = 13.7e6           # FEMA NRI v1.20 value of a statistical life; 10 injuries = 1 death
 
 
+# --- Logging helper ---
+# A small class that bundles state (step name, collected lines) with behavior
+# (write, check, close). Each step creates one: log = StepLog("02_tracks").
+# check() returns the boolean it was given, so it can also sit inside an `if`.
 class StepLog:
     """Prints progress and saves the same lines to clean/logs/<step>.txt."""
 
@@ -71,10 +81,16 @@ class StepLog:
         self.path.write_text("\n".join(self.lines) + "\n")
 
 
+# --- Small helpers ---
+# state_of: the first 2 characters of a FIPS code are the state. `.str` applies
+# a string operation to every value in a pandas column at once (vectorized).
 def state_of(fips):
     return fips.str[:2]
 
 
+# cpi_factors: returns a Series indexed by year. Multiplying a nominal dollar
+# amount by factor[year] converts it to 2023 dollars. `g.size() == 12` is a
+# boolean mask that keeps only years with all 12 months of data.
 def cpi_factors():
     """Factor that converts a year's dollars to BASE_DOLLAR_YEAR dollars.
     Annual average of monthly CPI-U; incomplete years are excluded."""
@@ -85,6 +101,9 @@ def cpi_factors():
     return annual[BASE_DOLLAR_YEAR] / annual
 
 
+# haversine_km: distance along the Earth's surface. Because it only uses numpy
+# functions, it works on single numbers OR whole arrays. Step 03 relies on
+# this (broadcasting) to get every storm-hour x county distance in one call.
 def haversine_km(lat1, lon1, lat2, lon2):
     """Great-circle distance in km; inputs in degrees, numpy-broadcastable."""
     lat1, lon1, lat2, lon2 = map(np.radians, (lat1, lon1, lat2, lon2))
@@ -93,6 +112,9 @@ def haversine_km(lat1, lon1, lat2, lon2):
     return 6371.0 * 2 * np.arcsin(np.sqrt(a))
 
 
+# snake: turns a header like "Hurricane - Expected Annual Loss" into
+# "hurricane_expected_annual_loss". The generator expression inside join()
+# handles one character at a time; the while loop collapses repeated "_".
 def snake(text):
     out = "".join(ch.lower() if ch.isalnum() else "_" for ch in text)
     while "__" in out:

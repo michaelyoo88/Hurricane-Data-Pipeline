@@ -19,6 +19,10 @@ FINAL.mkdir(exist_ok=True)
 U = "usd2023"
 
 # ---------------- counties (dimension) --------------------------------------
+# Start from the clean county table, add the _usd2023 suffix to money columns,
+# and copy FEMA's hurricane columns. nri_map pairs each source column with
+# (new name, is_money); money columns are converted to 2023 dollars. Note the
+# tuple unpacking in the loop: `for src, (dst, money) in nri_map.items()`.
 c = pd.read_csv(CLEAN / "counties.csv", dtype={"fips": str})
 f_nri = cpi_factors()[NRI_DOLLAR_YEAR]
 H = "nri_hrcn_"
@@ -54,11 +58,19 @@ sc = pd.read_csv(CLEAN / "storm_county.csv", dtype={"fips": str})
 ls = pd.read_csv(CLEAN / "losses.csv", dtype={"fips": str})
 
 
+# Saffir-Simpson category from peak wind in knots. pd.cut puts each value in a
+# bin: (-1, 33] TD, (33, 63] TS, (63, 82] Cat 1, and so on up to Cat 5.
 def category(kt):
     bins = [-1, 33, 63, 82, 95, 112, 136, 1e9]
     return pd.cut(kt, bins, labels=["TD", "TS", "1", "2", "3", "4", "5"]).astype(str)
 
 
+# One row per storm: basic facts from the 6-hourly track (name, start / end,
+# peak wind), then two groupby .agg() summaries merged on:
+#   near  how many counties it reached and how close it came. This is named
+#         aggregation syntax: new_col=(source_col, function)
+#   obs   total observed losses
+# Storms in labeled years with no losses get 0; earlier years stay blank.
 g = t6.groupby("storm_id")
 storms = pd.DataFrame({
     "name": g.name.first(), "year": g.year.first(),
@@ -83,6 +95,10 @@ for col in [f"obs_prop_dmg_{U}", f"obs_crop_dmg_{U}", "obs_deaths_direct"]:
 storms = storms.sort_values(["year", "start_utc"])
 
 # ---------------- storm_county (fact) ---------------------------------------
+# Start from storm_county, give columns their final names, and left-join the
+# summed losses. Labeled years: missing loss = 0. Unlabeled years: forced to NaN
+# (unknown, not zero). The merge with storms only sorts rows by storm start
+# time; that helper column is dropped right after.
 fact = sc.rename(columns={"vmax_peak_within_100km_ms": "vmax_peak_100km_ms",
                           "time_at_min": "time_at_min_utc",
                           "t_enter_500km": "enter_500km_utc",
@@ -105,10 +121,13 @@ fact = fact.merge(storms[["storm_id", "start_utc"]], on="storm_id").sort_values(
     ["start_utc", "fips"]).drop(columns="start_utc")
 
 # ---------------- storm_tracks (detail) -------------------------------------
+# Hourly tracks, keeping only the columns needed downstream.
 tracks = pd.read_csv(CLEAN / "tracks_hourly.csv").rename(columns={"time_utc": "time_utc"})
 tracks = tracks[["storm_id", "time_utc", "lat", "lon", "vmax_ms", "pmin_mb", "status"]]
 
 # ---------------- checks -----------------------------------------------------
+# Database-style integrity checks: each key is unique, and every key in the
+# fact table exists in its dimension table (referential integrity).
 log.check(counties.fips.is_unique, "counties: fips is a unique key")
 log.check(storms.storm_id.is_unique, "storms: storm_id is a unique key")
 log.check(not fact.duplicated(["storm_id", "fips"]).any(), "storm_county: (storm_id, fips) is a unique key")
@@ -129,6 +148,10 @@ log.write(f"NOTE  rows where crop damage > agriculture value: {over_a} "
           "(NOAA crop damage includes timber; NRI agriculture value does not)")
 
 # ---------------- data dictionary -------------------------------------------
+# For every column of every table, look up (unit, description, source):
+# the table-specific entry first, else the shared ("*", col) entry. `or` falls
+# through to the second lookup when the first returns None. Also records the
+# % blank, and lists any column nobody documented.
 from data_dictionary import DESCRIPTIONS
 tables = {"storm_county": fact, "storms": storms, "counties": counties, "storm_tracks": tracks}
 rows, missing = [], []
@@ -144,6 +167,7 @@ for tname, df in tables.items():
                      "pct_blank": round(df[col].isna().mean() * 100, 1)})
 log.check(not missing, f"every column documented ({len(missing)} missing: {missing[:5]})")
 
+# --- Write every table and the data dictionary to final/ ---
 for tname, df in tables.items():
     df.to_csv(FINAL / f"{tname}.csv", index=False)
     log.write(f"final/{tname}.csv: {len(df):,} rows x {df.shape[1]} columns")

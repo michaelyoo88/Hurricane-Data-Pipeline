@@ -17,6 +17,12 @@ import pandas as pd
 from common import *
 
 log = StepLog("00_ct_crosswalk")
+# --- 1. Read the town crosswalk; count towns per (old county, region) ---
+# Each row is one town. sep="|" because the file is pipe-delimited; dtype=str
+# keeps codes like "001" from becoming the number 1. The raw column names
+# contain line breaks, so only the first line of each name is kept.
+# groupby(...).size().unstack() builds a matrix: rows = old counties,
+# columns = regions, cells = number of towns. This is the IPF "seed".
 cw = pd.read_csv(SRC / "ct_cou_to_cousub_crosswalk.txt", sep="|", dtype=str,
                  encoding="utf-8-sig")
 cw.columns = [c.split("\n")[0] for c in cw.columns]
@@ -26,6 +32,12 @@ seed = cw.groupby(["old_fips", "region_fips"]).size().unstack(fill_value=0)
 log.write(f"Town rows: {len(cw)}; old counties: {seed.shape[0]}; regions: {seed.shape[1]}; "
           f"old-county x region pairs: {(seed > 0).sum().sum()}")
 
+# --- 2. Population totals each side must match ---
+# old_pop: 2020 population of the 8 old counties (Census).
+# reg_pop: 2020 population of the 9 planning regions (NRI).
+# .reindex() puts both in the same order as the seed matrix's rows / columns.
+# The two sources disagree slightly, so regions are rescaled to the Census
+# total; otherwise IPF could never satisfy both sets of totals.
 cp = pd.read_csv(SRC / "cenpop2020_county.txt", dtype=str, encoding="utf-8-sig")
 old_pop = (cp.assign(fips=cp.STATEFP + cp.COUNTYFP).set_index("fips")
            .POPULATION.astype(float).reindex(seed.index))
@@ -38,6 +50,11 @@ log.write(f"Population totals: old counties {old_pop.sum():,.0f}; regions "
           "regions rescaled to the old-county total")
 reg_pop = reg_pop * old_pop.sum() / reg_pop.sum()
 
+# --- 3. Iterative proportional fitting (IPF) ---
+# Alternately rescale rows to hit the old-county totals, then columns to hit
+# the region totals, until both hold. m.sum(1) = row sums, m.sum(0) = column
+# sums. [:, None] and [None, :] reshape a 1-D array into a column or a row so
+# numpy broadcasts the multiply across the whole matrix. `_` = unused loop var.
 m = seed.to_numpy(float)
 for _ in range(1000):
     m *= (old_pop.to_numpy() / m.sum(1))[:, None]
@@ -48,6 +65,11 @@ flows = pd.DataFrame(m, index=seed.index, columns=seed.columns)
 err = max(np.abs(flows.sum(1) / old_pop - 1).max(), np.abs(flows.sum(0) / reg_pop - 1).max())
 log.check(err < 1e-3, f"IPF matches old-county and region population totals (max error {err:.3%})")
 
+# --- 4. Back to one row per pair; compute each pair's share ---
+# .stack() turns the matrix back into a long table (old_fips, region_fips, value).
+# share = fraction of an old county's population living in each region.
+# groupby().transform("sum") puts the group total on every row so we can divide
+# row by row. Steps 01 and 04 use this share to split old-county data.
 out = (flows.stack().rename("pop_2020_est").reset_index()
        .merge(seed.stack().rename("n_towns").reset_index()))
 out = out[out.n_towns > 0].copy()

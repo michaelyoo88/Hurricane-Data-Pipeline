@@ -8,6 +8,7 @@ from pathlib import Path
 import pandas as pd
 
 FINAL = Path(__file__).resolve().parents[1] / "final"
+# Which columns to parse as dates in each table (leading _ = internal use).
 _DATES = {"storm_county": ["time_at_min_utc", "enter_500km_utc", "exit_500km_utc"],
           "storms": ["start_utc", "end_utc"], "storm_tracks": ["time_utc"]}
 
@@ -30,6 +31,9 @@ def model_table(labeled_only=True):
     c = load("counties")[["fips", "state", "population", "bldg_value_usd2023",
                           "ag_value_usd2023", "density_per_sqmi", "coastal"]]
     s = load("storms")[["storm_id", "name", "peak_category"]]
+    # Join the fact table to its dimension tables (star schema), optionally keep
+    # labeled years only, then compute ratios. .where(cond) blanks crop_ratio where
+    # agriculture value is 0, avoiding division by zero (inf).
     df = sc.merge(c, on="fips").merge(s, on="storm_id")
     if labeled_only:
         df = df[df.has_labels].copy()
