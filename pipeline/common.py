@@ -1,122 +1,90 @@
-"""Shared settings and helpers for the hurricane data pipeline.
+"""Settings and small helper functions shared by every pipeline step.
 
-Every setting that encodes a project decision lives here, so a change of
-mind (radius, years, dollar year) is a one-line edit followed by run_all.py.
+Every number that encodes a project decision lives here. To change a decision,
+edit one line and re-run run_all.py.
 """
 from pathlib import Path
-import datetime as dt
 
 import numpy as np
 import pandas as pd
 
-# --- Project paths ---
-# __file__ is this script's own path; .resolve().parents[1] climbs to the
-# project root, so the pipeline works no matter which folder you run it from.
-# Path objects join with `/` (ROOT / "source") instead of string gluing.
+# ---- Folders ---------------------------------------------------------------
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "source"          # raw downloads, never edited
-CLEAN = ROOT / "clean"         # rebuilt by the pipeline
-LOGS = CLEAN / "logs"
+SOURCE = ROOT / "source"   # raw downloads, never edited
+CLEAN = ROOT / "clean"     # in-between tables, rebuilt every run
+FINAL = ROOT / "final"     # tables we model on, rebuilt every run
+CLEAN.mkdir(exist_ok=True)
+FINAL.mkdir(exist_ok=True)
 
-# Every step starts with `from common import *`, so each UPPERCASE name below
-# becomes a global constant inside every script.
-# --- Decisions locked Oct 11-12 ---------------------------------------------
-STORM_YEAR_MIN, STORM_YEAR_MAX = 1975, 2025   # storms kept from HURDAT2
-LABEL_YEAR_MIN, LABEL_YEAR_MAX = 1996, 2025   # years with NY Fed loss labels
-BASE_DOLLAR_YEAR = 2023                       # all money converted to this year
-NRI_DOLLAR_YEAR = 2023  # TODO: confirm in the NRI technical documentation
-MATCH_RADIUS_KM = 500   # storm must pass within this distance to count
-NEAR_KM = 100           # used for hours_within_100km
-DATE_PAD_DAYS = 1       # slack on loss-record dates (local time vs UTC)
+# ---- Years -------------------------------------------------------------------
+STORM_YEARS = (1975, 2025)   # storms kept from HURDAT2 (satellite era onward)
+LABEL_YEARS = (1996, 2024)   # years with damage records (2025 is incomplete in our download: 11 records, $0)
+DOLLAR_YEAR = 2023           # every dollar amount is converted to this year
+NRI_DOLLAR_YEAR = 2023       # TODO: confirm the year in FEMA's NRI documentation
 
-# Scope: contiguous 48 states + DC. Drop AK, HI and all territories.
-EXCLUDED_STATE_FIPS = {"02", "15", "60", "66", "69", "72", "78"}
+# ---- Distances ---------------------------------------------------------------
+MATCH_RADIUS_KM = 500   # a storm "reaches" a county if its center passes this close
+NEAR_KM = 100           # used to count hours a storm spent very close
 
-# Connecticut: old counties (NY Fed, Census 2020) vs planning regions (NRI)
-CT_OLD_COUNTIES = {"09001", "09003", "09005", "09007",
-                   "09009", "09011", "09013", "09015"}
-CT_CROSSWALK = CLEAN / "ct_crosswalk.csv"     # built by 00_ct_crosswalk.py
-
-# NY Fed weighting schemes chosen
-WEIGHT_PROPERTY = "Housing"     # property and crop damage
-WEIGHT_PEOPLE = "Population"    # deaths and injuries
-WEIGHT_SENSITIVITY = "Area"     # crop damage, sensitivity check only
-
+# ---- Wind --------------------------------------------------------------------
 KT_TO_MS = 0.514444
+WIND_DECAY = 0.5        # how fast wind fades outside the eyewall (standard Rankine value)
+HURRICANE_MS = 32.9     # 64 knots = hurricane-force wind
+TROPICAL_STORM_MS = 17.5  # 34 knots = tropical-storm-force wind
 
-# --- County x year table (step 08) -------------------------------------------
-# Wind at a county = simple modified Rankine vortex at the storm's closest approach:
-#   V = Vmax                         if distance <= RMW_KM
-#   V = Vmax * (RMW_KM / d) ** 0.5   otherwise
-RMW_KM = 40.0              # radius of maximum wind, same for every storm (assumption)
-RANKINE_EXP = 0.5          # how fast wind fades with distance (assumption)
-HURRICANE_MS = 32.9        # 64 kt: hurricane-force wind = a "hit"
-TROPICAL_STORM_MS = 17.5   # 34 kt: tropical-storm-force wind
-VSL_USD = 13.7e6           # FEMA NRI v1.20 value of a statistical life; 10 injuries = 1 death
+# ---- Money -------------------------------------------------------------------
+VSL = 13.7e6   # FEMA NRI v1.20 value of a statistical life; 10 injuries = 1 death
 
+# ---- Scope ---------------------------------------------------------------------
+# Contiguous 48 states + DC only: drop Alaska, Hawaii and the territories.
+DROP_STATES = {"02", "15", "60", "66", "69", "72", "78"}
+# Connecticut's 8 old county codes (used by the NY Fed and Census 2020)
+CT_OLD_COUNTIES = {"09001", "09003", "09005", "09007", "09009", "09011", "09013", "09015"}
 
-# --- Logging helper ---
-# A small class that bundles state (step name, collected lines) with behavior
-# (write, check, close). Each step creates one: log = StepLog("02_tracks").
-# check() returns the boolean it was given, so it can also sit inside an `if`.
-class StepLog:
-    """Prints progress and saves the same lines to clean/logs/<step>.txt."""
+# NY Fed splits each zone's damage across counties several ways; we use:
+PROPERTY_WEIGHT = "Housing"     # property and crop damage follow where houses are
+PEOPLE_WEIGHT = "Population"    # deaths and injuries follow where people are
+CROP_CHECK_WEIGHT = "Area"      # crop damage by land area, kept as a sensitivity check
 
-    def __init__(self, name):
-        LOGS.mkdir(parents=True, exist_ok=True)
-        self.name = name
-        self.path = LOGS / f"{name}.txt"
-        self.lines = []
-        self.write(f"{name}  (run {dt.datetime.now():%Y-%m-%d %H:%M})")
-
-    def write(self, msg=""):
-        print(f"  [{self.name}] {msg}")
-        self.lines.append(str(msg))
-
-    def check(self, ok, msg):
-        self.write(("PASS  " if ok else "WARN  ") + msg)
-        return ok
-
-    def close(self):
-        self.path.write_text("\n".join(self.lines) + "\n")
+# ---- Modeling ---------------------------------------------------------------------
+SEED = 42                  # pass to every random step so results are reproducible
+TRAIN_YEARS = (2000, 2019) # yearly property/farm values start in 2000
+TEST_YEARS = (2020, 2024)  # held out: never used for training or tuning
 
 
-# --- Small helpers ---
-# state_of: the first 2 characters of a FIPS code are the state. `.str` applies
-# a string operation to every value in a pandas column at once (vectorized).
-def state_of(fips):
-    return fips.str[:2]
-
-
-# cpi_factors: returns a Series indexed by year. Multiplying a nominal dollar
-# amount by factor[year] converts it to 2023 dollars. `g.size() == 12` is a
-# boolean mask that keeps only years with all 12 months of data.
-def cpi_factors():
-    """Factor that converts a year's dollars to BASE_DOLLAR_YEAR dollars.
-    Annual average of monthly CPI-U; incomplete years are excluded."""
-    cpi = pd.read_csv(SRC / "cpi_monthly.csv")
-    cpi["year"] = cpi["observation_date"].str[:4].astype(int)
-    g = cpi.groupby("year")["CPIAUCSL"]
-    annual = g.mean()[g.size() == 12]
-    return annual[BASE_DOLLAR_YEAR] / annual
-
-
-# haversine_km: distance along the Earth's surface. Because it only uses numpy
-# functions, it works on single numbers OR whole arrays. Step 03 relies on
-# this (broadcasting) to get every storm-hour x county distance in one call.
 def haversine_km(lat1, lon1, lat2, lon2):
-    """Great-circle distance in km; inputs in degrees, numpy-broadcastable."""
+    """Distance in km between points on the Earth's surface (inputs in degrees).
+    Works on numpy arrays, so one call can measure many storm-county pairs."""
     lat1, lon1, lat2, lon2 = map(np.radians, (lat1, lon1, lat2, lon2))
     a = (np.sin((lat2 - lat1) / 2) ** 2
          + np.cos(lat1) * np.cos(lat2) * np.sin((lon2 - lon1) / 2) ** 2)
     return 6371.0 * 2 * np.arcsin(np.sqrt(a))
 
 
-# snake: turns a header like "Hurricane - Expected Annual Loss" into
-# "hurricane_expected_annual_loss". The generator expression inside join()
-# handles one character at a time; the while loop collapses repeated "_".
-def snake(text):
-    out = "".join(ch.lower() if ch.isalnum() else "_" for ch in text)
-    while "__" in out:
-        out = out.replace("__", "_")
-    return out.strip("_")
+def cpi_factors():
+    """Multiply a year's dollars by factor[year] to get DOLLAR_YEAR dollars.
+    Uses the yearly average of monthly CPI; incomplete years are skipped."""
+    cpi = pd.read_csv(SOURCE / "cpi_monthly.csv")
+    cpi["year"] = cpi["observation_date"].str[:4].astype(int)
+    by_year = cpi.groupby("year")["CPIAUCSL"]
+    yearly = by_year.mean()[by_year.size() == 12]
+    return yearly[DOLLAR_YEAR] / yearly
+
+
+def willoughby_rmax_km(vmax_ms, lat):
+    """Radius of maximum wind (km): how far from the eye the strongest winds are.
+
+    Willoughby, Darling & Rahn (2006), "Parametric representation of the primary
+    hurricane vortex. Part II", Monthly Weather Review 134: 1102-1120, fitted to
+    decades of aircraft measurements:
+        Rmax = 46.4 * exp(-0.0155 * Vmax + 0.0169 * latitude)
+    Stronger storms are tighter; storms farther north are larger.
+    We use it for every storm so all years are treated the same way.
+    """
+    return 46.4 * np.exp(-0.0155 * vmax_ms + 0.0169 * lat)
+
+
+def rankine_wind_ms(vmax_ms, rmax_km, dist_km):
+    """Wind at a distance from the eye (modified Rankine vortex):
+    full Vmax inside Rmax, then fading as (Rmax / distance) ** WIND_DECAY."""
+    return vmax_ms * np.minimum(1.0, rmax_km / dist_km) ** WIND_DECAY

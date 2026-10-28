@@ -1,102 +1,64 @@
-"""Step 02: parse HURDAT2 storm tracks.
+"""Step 02 - Storm tracks from HURDAT2.
 
-In : source/hurdat2_atlantic.txt
-Out: clean/tracks_6h.csv     (every best-track row, all fields parsed)
-     clean/tracks_hourly.csv (linear interpolation to whole hours)
+HURDAT2 is a text file: each storm has a header line (id, name) followed by one
+line per 6-hourly reading (time, position, max wind, pressure, ...).
+We keep storms from 1975-2025, then fill in hourly positions by straight-line
+interpolation between readings, so a fast storm can't "skip over" a county.
+
+Out: clean/tracks_6h.csv      (one row per storm per 6-hour reading)
+     clean/tracks_hourly.csv  (one row per storm per hour, with storm size)
 """
 import numpy as np
 import pandas as pd
 from common import *
 
-log = StepLog("02_tracks")
-# Wind-radii column names: 3 wind speeds x 4 quadrants = 12 names, built with
-# a nested list comprehension (r34_ne_nm, r34_se_nm, ..., r64_nw_nm).
-QUADS = ["ne", "se", "sw", "nw"]
-RADII = [f"r{k}_{q}_nm" for k in (34, 50, 64) for q in QUADS]
+
+def value(text):
+    """HURDAT2 marks missing numbers as -99 or -999."""
+    v = float(text)
+    return np.nan if v < 0 else v
 
 
-# Parse one numeric field: blank -> NaN, negative codes (-99 / -999) -> NaN.
-def num(x):
-    v = float(x) if x not in ("", None) else np.nan
-    return np.nan if v < 0 else v   # HURDAT2 codes missing values as -99 / -999
-
-
-# --- 1. Parse the HURDAT2 text file line by line ---
-# The file alternates: one header line per storm ("AL092022, IAN, ...") then
-# its track lines. A header sets sid / name / year, which stay in effect for
-# the track lines below it. Each track line becomes a dict, and a list of dicts
-# converts neatly into a DataFrame. `with open(...)` closes the file for you.
-# The N/S and E/W letters on lat/lon become + / - signs.
 rows = []
-n_storms_all = 0
-with open(SRC / "hurdat2_atlantic.txt") as fh:
-    for line in fh:
-        parts = [p.strip() for p in line.rstrip("\n").split(",")]
-        if line[:2].isalpha():                       # header line
-            sid, name = parts[0], parts[1]
-            year = int(sid[4:8])
-            n_storms_all += 1
+with open(SOURCE / "hurdat2_atlantic.txt") as f:
+    for line in f:
+        parts = [p.strip() for p in line.split(",")]
+        if line[:2].isalpha():                      # header line, e.g. "AL092022, IAN, 52,"
+            storm_id, name, year = parts[0], parts[1], int(parts[0][4:8])
             continue
-        if not (STORM_YEAR_MIN <= year <= STORM_YEAR_MAX):
+        if not STORM_YEARS[0] <= year <= STORM_YEARS[1]:
             continue
-        date, hhmm, rec, status, lat, lon = parts[:6]
-        lat_v = float(lat[:-1]) * (1 if lat[-1] == "N" else -1)
-        lon_v = float(lon[:-1]) * (-1 if lon[-1] == "W" else 1)
-        row = {"storm_id": sid, "name": name, "year": year,
-               "time_utc": pd.Timestamp(f"{date} {hhmm[:2]}:{hhmm[2:]}"),
-               "record_id": rec, "status": status, "lat": lat_v, "lon": lon_v,
-               "vmax_kt": num(parts[6]), "pmin_mb": num(parts[7])}
-        row.update({k: num(v) for k, v in zip(RADII, parts[8:20])})
-        row["rmw_nm"] = num(parts[20]) if len(parts) > 20 else np.nan
-        rows.append(row)
+        date, hhmm, _, status, lat, lon, wind_kt, pressure = parts[:8]
+        rows.append({
+            "storm_id": storm_id, "name": name, "year": year,
+            "time_utc": pd.Timestamp(f"{date} {hhmm[:2]}:{hhmm[2:]}"),
+            "status": status,                                   # HU, TS, TD, EX, ...
+            "lat": float(lat[:-1]) * (1 if lat.endswith("N") else -1),
+            "lon": float(lon[:-1]) * (-1 if lon.endswith("W") else 1),
+            "vmax_ms": value(wind_kt) * KT_TO_MS,               # knots -> m/s
+            "pmin_mb": value(pressure),
+        })
 
-# --- 2. Build the 6-hourly table, remove duplicates, save ---
-t6 = pd.DataFrame(rows)
-t6["vmax_ms"] = t6["vmax_kt"] * KT_TO_MS
-log.write(f"Storms in file: {n_storms_all}; kept {STORM_YEAR_MIN}-{STORM_YEAR_MAX}: "
-          f"{t6.storm_id.nunique()} storms, {len(t6)} best-track rows")
-dups = t6.duplicated(["storm_id", "time_utc"]).sum()
-t6 = t6.drop_duplicates(["storm_id", "time_utc"]).sort_values(["storm_id", "time_utc"])
-log.write(f"Duplicate storm-time rows removed: {dups}")
-log.write(f"Rows missing wind: {t6.vmax_ms.isna().sum()}")
-log.write(f"Rows missing pressure: {t6.pmin_mb.isna().mean():.1%}; "
-          f"missing radius of max wind: {t6.rmw_nm.isna().mean():.1%} (recorded from 2021 only)")
-t6.to_csv(CLEAN / "tracks_6h.csv", index=False)
+tracks = pd.DataFrame(rows).sort_values(["storm_id", "time_utc"])
+tracks.to_csv(CLEAN / "tracks_6h.csv", index=False)
 
-# Hourly interpolation of position, wind and pressure
-# Best-track points are 6 hours apart and a fast storm moves ~100 km in that
-# time, so whole hours are filled in. For each storm: build an hourly time grid,
-# convert times to integers (int64 nanoseconds) and let np.interp draw straight
-# lines between known points. Wind / pressure use only non-missing points.
-# np.searchsorted finds the last known point at or before each hour, so status
-# (a label, which can't be averaged) is carried forward instead.
-hourly = []
-for sid, g in t6.groupby("storm_id", sort=False):
-    h0 = g.time_utc.min().ceil("h")
-    h1 = g.time_utc.max().floor("h")
-    grid = pd.date_range(h0, h1, freq="h")
-    x = g.time_utc.astype("int64").to_numpy()
-    xi = grid.astype("int64").to_numpy()
-    out = pd.DataFrame({"storm_id": sid, "name": g.name.iat[0],
-                        "year": g.year.iat[0], "time_utc": grid})
-    for col in ("lat", "lon"):
-        out[col] = np.interp(xi, x, g[col].to_numpy())
-    for col in ("vmax_ms", "pmin_mb"):          # interpolate over valid values only
-        ok = g[col].notna().to_numpy()
-        out[col] = np.interp(xi, x[ok], g[col].to_numpy()[ok]) if ok.sum() >= 2 else np.nan
-    # status = the most recent best-track status at or before each hour
-    pos = np.searchsorted(x, xi, side="right") - 1
-    out["status"] = g.status.to_numpy()[np.clip(pos, 0, None)]
-    hourly.append(out)
-th = pd.concat(hourly, ignore_index=True)
 
-# --- 3. Sanity checks and save ---
-log.check(th.year.nunique() == STORM_YEAR_MAX - STORM_YEAR_MIN + 1,
-          f"{th.year.nunique()} storm seasons present (expect {STORM_YEAR_MAX - STORM_YEAR_MIN + 1})")
-log.check(th.vmax_ms.dropna().between(0, 90).all(),
-          f"wind between 0 and 90 m/s (max {th.vmax_ms.max():.1f})")
-log.check(th.lat.between(0, 75).all() and th.lon.between(-140, 20).all(),
-          "positions plausible (a few storms, e.g. Bonnie 2022, cross into the Pacific)")
-log.write(f"Hourly rows out: {len(th)}")
-th.to_csv(CLEAN / "tracks_hourly.csv", index=False)
-log.close()
+def to_hourly(storm):
+    """Interpolate one storm's readings to every whole hour."""
+    hours = pd.date_range(storm.time_utc.min().ceil("h"), storm.time_utc.max().floor("h"), freq="h")
+    t, th = storm.time_utc.astype("int64"), hours.astype("int64")
+    out = pd.DataFrame({"time_utc": hours})
+    for col in ["lat", "lon", "vmax_ms", "pmin_mb"]:
+        ok = storm[col].notna()
+        out[col] = np.interp(th, t[ok], storm[col][ok]) if ok.sum() >= 2 else np.nan
+    # storm type = the most recent reading at or before each hour
+    out = pd.merge_asof(out, storm[["time_utc", "status"]], on="time_utc")
+    out.insert(0, "storm_id", storm.storm_id.iloc[0])
+    return out
+
+
+hourly = pd.concat([to_hourly(s) for _, s in tracks.groupby("storm_id")], ignore_index=True)
+hourly["rmax_km"] = willoughby_rmax_km(hourly.vmax_ms, hourly.lat).round(1)   # storm size
+hourly.to_csv(CLEAN / "tracks_hourly.csv", index=False)
+print(f"02 tracks: {tracks.storm_id.nunique()} storms, {len(tracks):,} readings, "
+      f"{len(hourly):,} hourly rows")

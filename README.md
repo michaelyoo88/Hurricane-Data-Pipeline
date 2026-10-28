@@ -1,71 +1,58 @@
 # Hurricane Data Pipeline
 
-Builds the hurricane modeling dataset from untouched source files.
-
-## Setting up environment
+Builds our hurricane modeling dataset from untouched source files.
 
 ```
-python3 -m venv .venv               # create project venv
-source .venv/bin/activate           # use it (prompt shows (.venv))
-pip install -r requirements.txt     # install pinned libraries
-pip install <pkg>                   # add a new library
-pip freeze > requirements.txt       # save versions after installing
-deactivate                          # back to system Python
-```
-
-```
-python3 pipeline/run_all.py        # run entire data pipeline
+python3 pipeline/run_all.py        # about 2-3 minutes
 ```
 
 ```python
 import sys; sys.path.insert(0, "pipeline")
 from load_data import load, model_table
 df = model_table()          # labeled storm x county rows + exposure + damage ratios
-storms = load("storms")     # any single table
 ```
 
 ## Folders
 
-| Folder | Contents | Edit by hand? |
-|---|---|---|
-| `source/` | Raw downloads (see `SOURCES.md`) | Never |
-| `pipeline/` | One script per step; `common.py` holds every project setting | Yes |
-| `clean/` | Intermediate tables + `logs/` (one log per step) | No, rebuilt |
-| `final/` | **The dataset to use** | No, rebuilt |
-| `docs/` | HURDAT2 format guide, NY Fed methodology | — |
-
-## Final dataset (`final/`), star schema
-
-| Table | Grain (one row per) | Key | Rows | Role |
-|---|---|---|---|---|
-| `storm_county.csv` | storm x county within 500 km | `storm_id` + `fips` | 164,592 | **Fact**: closest approach, storm strength, observed losses |
-| `storms.csv` | storm, 1975-2025 | `storm_id` | 839 | Dimension: name, peak strength, category, totals |
-| `counties.csv` | county (contiguous 48 + DC) | `fips` | 3,109 | Dimension: location, exposure, FEMA NRI hurricane benchmark |
-| `county_year.csv` | county x year, 1975-2025 | `fips` + `year` | 158,559 | **Minimum modeling table**: max wind, hurricane hit, annual hit probability, damage |
-| `storm_tracks.csv` | storm x hour | `storm_id` + `time_utc` | 133,061 | Detail: for upgrading the wind formula later |
-| `data_dictionary.csv` | column | `table` + `column` | 69 | Unit, description, source and % blank for every column |
+| Folder | What's in it |
+|---|---|
+| `source/` | Raw downloads, never edited (see `SOURCES.md`) |
+| `pipeline/` | One script per step; `common.py` holds every setting |
+| `clean/` | In-between tables, rebuilt every run |
+| `final/` | **The tables we model on**, rebuilt every run |
+| `docs/` | HURDAT2 format guide, NY Fed methodology |
 
 ## Steps
 
 | Step | What it does |
 |---|---|
-| 00 ct_crosswalk | Connecticut old counties -> 2022 planning regions (town crosswalk + population fitting) |
-| 01 counties | NRI master county list, centers of population, exposure in 2023 $ |
-| 02 tracks | HURDAT2 storms 1975-2025, parsed and interpolated to hours |
-| 03 storm_county | Closest approach of every storm to every county within 500 km |
-| 04 loss_records | NY Fed hurricane / tropical storm / depression records; CPI to 2023 $ |
-| 05 loss_match | Each loss record -> closest storm within 500 km during its dates |
-| 06 losses | Matched losses summed per storm x county |
-| 07 final | Publishes `final/`, checks keys and joins, writes the data dictionary |
-| 08 county_year | Collapses storms to one row per county per year; estimates wind (Rankine vortex), hits and hit probability |
+| 00 ct_crosswalk | Connecticut's old counties -> 2022 planning regions (by population) |
+| 01 counties | Master county list (contiguous US + DC), where people live, exposure, FEMA's hurricane numbers |
+| 01b housing_by_year | Housing units per county per year (Census, 2000-2024) and building value per year = FEMA value per 2020 unit x units |
+| 02 tracks | HURDAT2 storms 1975-2025, filled in to hourly; storm size from the Willoughby (2006) formula |
+| 03 storm_county | Every storm x county within 500 km: closest distance, estimated peak wind, time window |
+| 04 loss_records | NY Fed hurricane damage: one weighting scheme, fixed county codes, 2023 dollars |
+| 05 losses | Match each damage record to its storm (closest within 500 km on those dates), then add up |
+| 06 final_tables | Publish `storm_county`, `storms`, `counties`, `storm_tracks` |
+| 07 county_year | One row per county per year: max wind, hit, hit probability, damage |
+| data_dictionary | Writes `final/data_dictionary.csv` |
 
-## Rules worth knowing
+## Final tables
 
-- `fips` is 5-character text. Use `load()`, or `dtype={"fips": str}`.
-- Money ending `_usd2023` is in 2023 dollars (annual-average CPI-U).
-- Loss columns are **0** for labeled years (1996-2025) with no record and **blank** for 1975-1995 storms, which have no labels (`has_labels`).
-- Losses are wind-event records only (Hurricane, Tropical Storm, Tropical Depression). Storm surge and flood are excluded, matching FEMA's separate Coastal Flooding hazard. This is why Harvey (2017) and Helene (2024) look small.
-- NY Fed weights: Housing for property and crop damage, Population for deaths and injuries; `crop_dmg_area_usd2023` uses Area weights as a sensitivity check.
-- Damage can exceed exposure: NOAA crop damage includes timber, NRI agriculture value does not (63 labeled rows, plus 35 in counties with zero recorded farm value). `model_table()` flags these.
-- Scope: contiguous 48 states + DC. Alaska, Hawaii and territories are excluded.
-- Every setting (years, radius, dollar year, weights) is in `pipeline/common.py`.
+| Table | One row per | Rows |
+|---|---|---|
+| `storm_county.csv` | storm x county within 500 km (**main table**) | 164,592 |
+| `storms.csv` | storm, 1975-2025 | 839 |
+| `counties.csv` | county | 3,109 |
+| `storm_tracks.csv` | storm x hour | 133,061 |
+| `county_year.csv` | county x year | 158,559 |
+
+## Things to know
+
+- `fips` is text; use `load()` or `dtype={"fips": str}` so leading zeros survive.
+- Money ending `_usd2023` is in 2023 dollars.
+- Damage is **0** in years with records (1996-2024) and **blank** before 1996. Never fill blanks with 0.
+- Damage covers wind-type events only (hurricane, tropical storm, tropical depression). Storm surge and flooding are separate FEMA hazards, which is why Harvey and Helene look small.
+- Wind estimate: modified Rankine vortex, storm size from Willoughby, Darling & Rahn (2006), peak over all hours.
+- Building value varies by year (2000-2024) via Census housing units; farm value and population are still single snapshots from FEMA's NRI.
+- Settings (years, radius, dollar year, seed) are in `pipeline/common.py`.

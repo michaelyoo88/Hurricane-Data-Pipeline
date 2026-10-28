@@ -9,3 +9,6 @@
 | `cpi_monthly.csv` | FRED CPIAUCSL (CPI-U, seasonally adjusted): https://fred.stlouisfed.org/series/CPIAUCSL | 2026-10-12 | Monthly 1947-01 to 2026-08; pipeline uses complete years only |
 | `CenPop2020_Mean_TR09.txt` | Census 2020 Centers of Population, Connecticut tracts: https://www2.census.gov/geo/docs/reference/cenpop2020/tract/CenPop2020_Mean_TR09.txt | 2026-10-12 | Not used by the pipeline; kept for reference |
 | `ct_cou_to_cousub_crosswalk.txt` | Census Connecticut county-to-town crosswalk: https://www2.census.gov/geo/docs/reference/ct_change/ | 2026-10-12 | Used in step 00 |
+| `Housing_2000_2010.csv` | Census county housing unit estimates, 2000-2010 intercensal: https://www.census.gov/programs-surveys/popest/data/data-sets.html | 2026-10-28 | Has county codes |
+| `Housing_2010_2020.xlsx` | Census CO-EST2020INT-HU, 2010-2020 intercensal (Nov 2024 release) | 2026-10-28 | County names only; Connecticut old counties |
+| `Housing_2020_2025.xlsx` | Census CO-EST2025-HU, 2020-2025 (May 2026 release) | 2026-10-28 | County names only; Connecticut planning regions |

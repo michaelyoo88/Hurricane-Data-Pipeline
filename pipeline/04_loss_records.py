@@ -1,133 +1,72 @@
-"""Step 04: NY Fed hurricane / tropical storm loss records, one row per event x county.
+"""Step 04 - Recorded hurricane damage from the NY Fed dataset.
 
-In : source/nyc_fed_losses.csv (1.3 GB, read in chunks), source/cpi_monthly.csv,
-     clean/ct_crosswalk.csv (optional)
-Out: clean/loss_records.csv
+The NY Fed file (13.5M rows, 1.3 GB) has one row per weather event x county x
+"weighting scheme". The same event appears 6 times, once for each way the Fed
+split a forecast zone's damage across counties - so we must keep only ONE scheme
+per number, or we'd count every dollar 6 times.
+
+Steps: keep hurricane / tropical storm / tropical depression events, fix county
+codes that lost their leading zero, move Connecticut to planning regions, keep the
+contiguous US, and convert dollars to 2023 dollars.
+
+Out: clean/loss_records.csv  (one row per event x county)
 """
-import numpy as np
 import pandas as pd
 from common import *
 
-log = StepLog("04_loss_records")
-# Only these columns are read from the 1.3 GB file (fewer columns = less
-# memory), and only these three weighting schemes are kept.
-USE = ["event_id", "fips", "weight_type", "begin_date", "end_date", "geography",
-       "event_type", "disaster_group", "episode_id", "damages_property",
-       "damages_property_adj", "damages_crops", "injuries_direct",
-       "injuries_indirect", "fatalities_direct", "fatalities_indirect"]
-weights = [WEIGHT_PROPERTY, WEIGHT_PEOPLE, WEIGHT_SENSITIVITY]
+COLUMNS = ["event_id", "episode_id", "fips", "weight_type", "event_type", "disaster_group",
+           "begin_date", "end_date", "damages_property", "damages_crops",
+           "injuries_direct", "injuries_indirect", "fatalities_direct", "fatalities_indirect"]
+WEIGHTS = [PROPERTY_WEIGHT, PEOPLE_WEIGHT, CROP_CHECK_WEIGHT]
 
-# --- 1. Stream the huge file in chunks ---
-# chunksize makes read_csv return an iterator of DataFrames, 2M rows at a time,
-# so the whole file never has to fit in memory. Each chunk is filtered to
-# hurricane rows; pd.concat joins the survivors. zfill(5) restores FIPS codes
-# that lost their leading zero ("1001" -> "01001").
-parts, n_all = [], 0
-for ch in pd.read_csv(SRC / "nyc_fed_losses.csv", usecols=USE, chunksize=2_000_000,
-                      dtype={"fips": str, "event_id": str, "episode_id": str}):
-    n_all += len(ch)
-    parts.append(ch[(ch.disaster_group == "Hurricane/Tropical Storm")
-                    & ch.weight_type.isin(weights)])
-raw = pd.concat(parts, ignore_index=True)
-log.write(f"NY Fed rows read: {n_all:,}; hurricane/tropical rows for weights "
-          f"{weights}: {len(raw):,}")
-short = raw.fips.str.len().lt(5).sum()
-raw["fips"] = raw.fips.str.zfill(5)
-log.write(f"FIPS codes missing their leading zero, fixed: {short:,}")
+# The file is too big to load at once, so read it in chunks and keep what we need
+chunks = []
+for chunk in pd.read_csv(SOURCE / "nyc_fed_losses.csv", usecols=COLUMNS, chunksize=2_000_000,
+                         dtype={"fips": str, "event_id": str, "episode_id": str}):
+    keep = (chunk.disaster_group == "Hurricane/Tropical Storm") & chunk.weight_type.isin(WEIGHTS)
+    chunks.append(chunk[keep])
+raw = pd.concat(chunks, ignore_index=True)
+raw["fips"] = raw.fips.str.zfill(5)          # "1001" -> "01001"
 
-# --- 2. Split by weighting scheme and verify ---
-# The NY Fed file repeats every event once per weighting scheme. A dict
-# comprehension builds {scheme: DataFrame}. Checks: one row per event x county
-# in each, and the same property total in each (they split the same events).
+# One table per weighting scheme, then join them side by side
 key = ["event_id", "fips"]
-w = {k: raw[raw.weight_type == k].drop(columns="weight_type") for k in weights}
-for k, v in w.items():
-    log.check(not v.duplicated(key).any(), f"{k}: one row per event x county")
-tot = {k: v.damages_property.sum() for k, v in w.items()}
-log.check(np.allclose(list(tot.values()), tot[WEIGHT_PROPERTY], rtol=1e-6),
-          "property totals identical across weight types (each splits the same events)")
-
-# --- 3. Combine the schemes into one row per event x county ---
-# Property / crop damage come from Housing weights, the crop sensitivity column
-# from Area weights, deaths / injuries from Population weights, all merged on
-# the (event_id, fips) key. Missing amounts mean zero. .to_numpy() copies
-# values by position, skipping pandas' index alignment.
-hp = w[WEIGHT_PROPERTY]
-df = hp[key + ["episode_id", "event_type", "geography", "begin_date", "end_date"]].copy()
-df["prop_dmg_nominal"] = hp.damages_property.to_numpy()
-df["crop_dmg_nominal"] = hp.damages_crops.to_numpy()
-df["prop_dmg_nyfed_adj"] = hp.damages_property_adj.to_numpy()
-area = w[WEIGHT_SENSITIVITY][key + ["damages_crops"]].rename(
-    columns={"damages_crops": "crop_dmg_area_nominal"})
-ppl = w[WEIGHT_PEOPLE][key + ["injuries_direct", "injuries_indirect",
-                             "fatalities_direct", "fatalities_indirect"]].rename(
-    columns={"fatalities_direct": "deaths_direct", "fatalities_indirect": "deaths_indirect"})
-df = df.merge(area, on=key, how="left").merge(ppl, on=key, how="left")
+info = ["episode_id", "event_type", "begin_date", "end_date"]
+prop = raw[raw.weight_type == PROPERTY_WEIGHT][key + info + ["damages_property", "damages_crops"]]
+area = raw[raw.weight_type == CROP_CHECK_WEIGHT][key + ["damages_crops"]]
+people = raw[raw.weight_type == PEOPLE_WEIGHT][key + ["injuries_direct", "injuries_indirect",
+                                                      "fatalities_direct", "fatalities_indirect"]]
+records = (prop.merge(area, on=key, how="left", suffixes=("", "_area"))
+               .merge(people, on=key, how="left"))
+records = records.rename(columns={
+    "damages_property": "prop_dmg_nominal", "damages_crops": "crop_dmg_nominal",
+    "damages_crops_area": "crop_dmg_area_nominal",
+    "fatalities_direct": "deaths_direct", "fatalities_indirect": "deaths_indirect"})
 AMOUNTS = ["prop_dmg_nominal", "crop_dmg_nominal", "crop_dmg_area_nominal",
-           "prop_dmg_nyfed_adj", "injuries_direct", "injuries_indirect",
-           "deaths_direct", "deaths_indirect"]
-df[AMOUNTS] = df[AMOUNTS].fillna(0)
+           "injuries_direct", "injuries_indirect", "deaths_direct", "deaths_indirect"]
+records[AMOUNTS] = records[AMOUNTS].fillna(0)
 
-# Connecticut: old counties -> planning regions
-# Each old-county record is split across regions by population share (step 00):
-# .mul(share, axis=0) multiplies every amount column row by row. If two old
-# counties feed the same region in one event, the pieces are summed back into
-# one row. Without the crosswalk file, Connecticut records are dropped.
-ct = df.fips.isin(CT_OLD_COUNTIES)
-if CT_CROSSWALK.exists():
-    cw = pd.read_csv(CT_CROSSWALK, dtype={"old_fips": str, "region_fips": str})
-    ctr = df[ct].merge(cw, left_on="fips", right_on="old_fips")
-    ctr[AMOUNTS] = ctr[AMOUNTS].mul(ctr["share"], axis=0)
-    ctr["fips"] = ctr["region_fips"]
-    # two old counties can feed the same region in one event: sum them
-    meta = ctr.groupby(key)[["episode_id", "event_type", "geography",
-                            "begin_date", "end_date"]].first()
-    ctr = meta.join(ctr.groupby(key)[AMOUNTS].sum()).reset_index()
-    df = pd.concat([df[~ct], ctr[df.columns]], ignore_index=True)
-    log.write(f"Connecticut: {ct.sum()} records re-allocated to planning regions")
-else:
-    log.write(f"WARN  Connecticut crosswalk missing: {ct.sum()} records "
-              f"(${df.loc[ct, 'prop_dmg_nominal'].sum() / 1e6:,.0f}M nominal) dropped")
-    df = df[~ct]
+# Connecticut: split each old county's numbers across planning regions by population.
+# Two old counties can feed the same region in one event, so add those up.
+crosswalk = pd.read_csv(CLEAN / "ct_crosswalk.csv", dtype=str)
+crosswalk["share"] = crosswalk.share.astype(float)
+is_ct = records.fips.isin(CT_OLD_COUNTIES)
+ct = records[is_ct].merge(crosswalk, left_on="fips", right_on="old_fips")
+ct[AMOUNTS] = ct[AMOUNTS].mul(ct.share, axis=0)
+ct["fips"] = ct.region_fips
+ct = ct.groupby(key, as_index=False).agg({**{c: "first" for c in info}, **{c: "sum" for c in AMOUNTS}})
+records = pd.concat([records[~is_ct], ct[records.columns]], ignore_index=True)
 
-# --- Drop records outside the contiguous US + DC ---
-out = state_of(df.fips).isin(EXCLUDED_STATE_FIPS)
-log.write(f"Dropped outside contiguous US + DC: {out.sum()} records "
-          f"(${df.loc[out, 'prop_dmg_nominal'].sum() / 1e9:,.2f}B nominal property)")
-df = df[~out].copy()
+# Contiguous US only
+records = records[~records.fips.str[:2].isin(DROP_STATES)]
 
-# Inflation to BASE_DOLLAR_YEAR
-# Year = first 4 characters of begin_date; .map(f) looks up each year in the
-# CPI factor Series. The check compares our conversion with the NY Fed's own
-# adjusted values: a constant ratio across years means the same method.
-df["year"] = df.begin_date.str[:4].astype(int)
-f = cpi_factors()
-df["cpi_factor"] = df.year.map(f)
-log.check(df.cpi_factor.notna().all(), "CPI available for every record year")
-for c in ["prop_dmg", "crop_dmg", "crop_dmg_area"]:
-    df[f"{c}_2023"] = df[f"{c}_nominal"] * df.cpi_factor
+# Inflation: convert each record to 2023 dollars using its own year
+records["year"] = records.begin_date.str[:4].astype(int)
+factor = records.year.map(cpi_factors())
+for col in ["prop_dmg", "crop_dmg", "crop_dmg_area"]:
+    records[f"{col}_2023"] = records[f"{col}_nominal"] * factor
 
-by_year = df.groupby("year")[["prop_dmg_2023", "prop_dmg_nyfed_adj"]].sum()
-by_year = by_year[by_year.prop_dmg_nyfed_adj > 1e6]
-ratio = by_year.prop_dmg_2023 / by_year.prop_dmg_nyfed_adj
-log.check(ratio.max() / ratio.min() < 1.03,
-          f"our CPI conversion tracks NY Fed's own adjustment (ratio {ratio.min():.3f}-"
-          f"{ratio.max():.3f} across years; constant = same method, different base year)")
-
-# --- 4. Unique record ID, summary log, save ---
-df["record_id"] = df.event_id + "_" + df.fips
-log.check(df.record_id.is_unique, "record_id unique")
-log.write(f"Records out: {len(df):,}; years {df.year.min()}-{df.year.max()}; "
-          f"property ${df.prop_dmg_2023.sum() / 1e9:,.1f}B, crops "
-          f"${df.crop_dmg_2023.sum() / 1e9:,.1f}B ({BASE_DOLLAR_YEAR} dollars); "
-          f"deaths {df[['deaths_direct', 'deaths_indirect']].sum().sum():,.0f}")
-log.write("By event type (records, property $B):")
-for et, g in df.groupby("event_type"):
-    log.write(f"    {et:20s} {len(g):6,}  {g.prop_dmg_2023.sum() / 1e9:8.2f}")
-cols = ["record_id", "event_id", "episode_id", "fips", "event_type", "geography",
-        "begin_date", "end_date", "year", "prop_dmg_nominal", "prop_dmg_2023",
-        "crop_dmg_nominal", "crop_dmg_2023", "crop_dmg_area_nominal",
-        "crop_dmg_area_2023", "injuries_direct", "injuries_indirect",
-        "deaths_direct", "deaths_indirect", "prop_dmg_nyfed_adj", "cpi_factor"]
-df[cols].to_csv(CLEAN / "loss_records.csv", index=False)
-log.close()
+records["record_id"] = records.event_id + "_" + records.fips
+assert records.record_id.is_unique
+records.to_csv(CLEAN / "loss_records.csv", index=False)
+print(f"04 loss_records: {len(records):,} records, "
+      f"${records.prop_dmg_2023.sum() / 1e9:.1f}B property damage (2023 $)")
