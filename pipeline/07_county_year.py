@@ -49,9 +49,12 @@ cy.loc[~cy.has_labels, damage] = np.nan
 cy["total_dmg_usd2023"] = cy.prop_dmg_usd2023 + cy.crop_dmg_usd2023
 cy["pop_loss_usd2023"] = (cy.deaths_direct + cy.injuries_direct / 10) * VSL
 
-# What was at risk that year (housing units and building value; 2000-2024 only)
-housing = pd.read_csv(CLEAN / "housing_by_year.csv", dtype={"fips": str})
-cy = cy.merge(housing, on=["fips", "year"], how="left")
+# What was at risk that year (housing units, population, building value; 2000-2024 only)
+census = pd.read_csv(CLEAN / "census_by_year.csv", dtype={"fips": str})
+cy = cy.merge(census, on=["fips", "year"], how="left")
+# Farms at risk that year (USDA Census of Agriculture; 2000-2024 only)
+ag = pd.read_csv(CLEAN / "ag_by_year.csv", dtype={"fips": str})
+cy = cy.merge(ag, on=["fips", "year"], how="left")
 
 # Hits and how often they happen
 cy["hurricane_hit"] = cy.max_wind_ms >= HURRICANE_MS
@@ -61,8 +64,9 @@ rates = cy.groupby("fips").agg(p_hurricane_hit=("hurricane_hit", "mean"),
                                mean_hurricanes_per_yr=("n_storms_hurricane_force", "mean")).round(4)
 cy = cy.merge(rates.reset_index(), on="fips")
 
-cy = cy[["fips", "state", "county_name", "year", "has_labels", "housing_units",
-         "bldg_value_usd2023", "max_wind_ms", "hurricane_hit",
+cy = cy[["fips", "state", "county_name", "year", "has_labels", "population", "housing_units",
+         "bldg_value_usd2023", "farm_value_usd2023", "crop_value_usd2023", "forest_value_usd2023",
+         "cropland_acres", "woodland_acres", "max_wind_ms", "hurricane_hit",
          "ts_hit", "n_storms_500km", "n_storms_ts_force", "n_storms_hurricane_force",
          "p_hurricane_hit", "p_ts_hit", "mean_hurricanes_per_yr", "prop_dmg_usd2023",
          "crop_dmg_usd2023", "total_dmg_usd2023", "deaths_direct", "injuries_direct",

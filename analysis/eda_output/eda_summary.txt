@@ -1,0 +1,158 @@
+
+======================================================================
+1. What the table looks like
+======================================================================
+storm x county rows (labeled years): 107,229   columns: 42
+storms: 219   counties: 2,560   years: 1996-2024
+county-year rows (all years 1975-2025): 158,559
+
+Missing values (columns with any):
+  housing_units            10,050  (9.4%)
+  bldg_value_usd2023       10,050  (9.4%)
+  prop_ratio               10,050  (9.4%)
+  crop_ratio                3,007  (2.8%)
+  (prop_ratio is blank before 2000 because yearly housing starts in 2000)
+
+======================================================================
+2. Train / test split and how rare damage is
+======================================================================
+         rows  storms  prop_rows  crop_rows  death_rows      prop_usd      crop_usd       deaths
+period                                                                                          
+other   10050      25        478        114          52  1.364545e+10  3.515311e+09    45.000000
+test    26245      46        776         65          70  5.340575e+10  2.264004e+09   186.000000
+train   70934     148       2936        525         191  1.643963e+11  1.189140e+10  1134.013599
+
+share of rows with zero property: 96.1%
+share of rows with zero crop    : 99.3%
+share of rows with zero death   : 99.7%
+-> targets are mostly zeros: a model must handle zero-inflation (Tweedie/Poisson).
+
+======================================================================
+3. How big is damage when it happens (rows with damage > 0)
+======================================================================
+prop_dmg_usd2023   n=4,190  p10=1.12e+03  p25=1.31e+04  p50=1.37e+05  p75=1.55e+06  p90=2.01e+07  p99=1.18e+09  max=1.56e+10
+crop_dmg_usd2023   n=  704  p10=2.42e+03  p25=6.26e+04  p50=9.71e+05  p75=1.89e+07  p90=6.99e+07  p99=3.17e+08  max=9.12e+08
+prop_ratio         n=3,712  p10=9.57e-08  p25=1.3e-06  p50=1.77e-05  p75=0.000181  p90=0.00176  p99=0.0943  max=2.75
+crop_ratio         n=  669  p10=4.85e-05  p25=0.00124  p50=0.0255  p75=0.208  p90=0.904  p99=16.2  max=3.71e+03
+deaths_direct      n=  313  p10=0.0014  p25=0.0101  p50=0.998  p75=1  p90=2.72  p99=59.3  max=623
+
+top 100 rows hold 83% of all property damage -> very heavy tail
+crop damage larger than county farm value: 63 rows
+
+======================================================================
+4. Does each feature line up with damage?
+======================================================================
+Spearman rank correlation with log(1 + property damage):
+  wind_exposure          +0.39
+  hours_ts_force         +0.39
+  wind_est_ms            +0.27
+  hours_hurricane_force  +0.25
+  min_dist_km            -0.21
+  hours_within_100km     +0.21
+  rmax_km_at_min         -0.20
+  vmax_at_min_ms         +0.18
+  coastal                +0.12
+  month                  +0.07
+  population             +0.02
+  bldg_value_usd2023     +0.01
+  density_per_sqmi       -0.01
+  ag_value_usd2023       +0.00
+
+Property damage by wind speed bin (m/s):
+                rows  share_damaged  median_ratio  total_usd
+wind_bin                                                    
+[0.0, 10.0)    56272       0.002559     5.217e-06  3.767e+08
+[10.0, 17.5)   41509        0.03503     5.579e-06  2.796e+09
+[17.5, 25.0)    7099         0.2159     1.425e-05  2.647e+10
+[25.0, 32.9)    1736         0.3773     6.254e-05  1.908e+10
+[32.9, 42.0)     457         0.6127      0.001322  4.859e+10
+[42.0, 50.0)     107         0.7757       0.01334  5.137e+10
+[50.0, 58.0)      31         0.7742       0.06132   3.98e+10
+[58.0, 100.0)     18         0.9444        0.1158  4.296e+10
+
+Property damage by distance to storm center (km):
+             rows  share_damaged  total_usd
+dist_bin                                   
+(0, 25]      3600         0.1586  8.459e+10
+(25, 50]     4377         0.1348  6.933e+10
+(50, 100]    8735         0.1173  5.651e+10
+(100, 200]  18617        0.06559  1.368e+10
+(200, 300]  21515        0.02617  7.234e+09
+(300, 500]  50385       0.004366  1.103e+08
+
+======================================================================
+5. Rural vs urban, coastal vs inland
+======================================================================
+                  rows  share_damaged  share_crop  median_ratio  total_usd
+density_bin                                                               
+rural (low 25%)  26890        0.04388    0.008591     4.926e-05  3.055e+10
+2nd              26770        0.03836    0.006985     2.086e-05  2.632e+10
+3rd              26764         0.0318    0.004334     9.944e-06  3.197e+10
+urban (top 25%)  26805        0.04223    0.006342      7.08e-06  1.426e+11
+
+          rows  share_damaged  share_crop  median_ratio  total_usd
+coastal                                                           
+False    82809        0.02652     0.00413     1.627e-05  3.412e+10
+True     24420        0.08165     0.01482     2.229e-05  1.973e+11
+
+
+======================================================================
+6. Over time, biggest storms, biggest counties
+======================================================================
+Recorded damage per year (property + crop):
+  1996  $3.1B
+  1997  $129.1M
+  1998  $3.9B
+  1999  $10.0B
+  2000  $9.0M
+  2001  $8.9B
+  2002  $1.5B
+  2003  $3.1B
+  2004  $31.1B
+  2005  $81.2B
+  2006  $67.8M
+  2007  $56.9M
+  2008  $11.5B
+  2009  $1.3M
+  2010  $26.4M
+  2011  $885.5M
+  2012  $214.7M
+  2013  $0.1M
+  2014  $0.9M
+  2015  $0.6M
+  2016  $3.9B
+  2017  $13.9B
+  2018  $20.0B
+  2019  $28.7M
+  2020  $20.8B
+  2021  $9.7B
+  2022  $16.1B
+  2023  $422.8M
+  2024  $8.7B
+
+Top 10 storms by property damage:
+  KATRINA    2005     $49.4B  counties with damage: 199
+  IAN        2022     $16.0B  counties with damage: 49
+  WILMA      2005     $15.9B  counties with damage: 22
+  LAURA      2020     $14.3B  counties with damage: 41
+  MICHAEL    2018     $12.6B  counties with damage: 89
+  IVAN       2004     $10.7B  counties with damage: 135
+  RITA       2005      $9.8B  counties with damage: 107
+  IDA        2021      $9.7B  counties with damage: 76
+  FRANCES    2004      $9.1B  counties with damage: 68
+  CHARLEY    2004      $9.0B  counties with damage: 29
+
+Top 10 counties by total recorded damage (1996-2024):
+  12099 Palm Beach, FL: $17.6B
+  48201 Harris, TX: $11.8B
+  12071 Lee, FL: $11.3B
+  22019 Calcasieu, LA: $10.2B
+  12033 Escambia, FL: $9.0B
+  12015 Charlotte, FL: $8.2B
+  12005 Bay, FL: $7.8B
+  22071 Orleans, LA: $7.1B
+  37001 Alamance, NC: $6.4B
+  01097 Mobile, AL: $6.1B
+
+county-years in labeled period: 90,161; with any damage: 3,412 (3.8%)
+counties that never had recorded damage: 2,132 of 3,109

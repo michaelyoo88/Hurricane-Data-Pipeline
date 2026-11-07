@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-STEPS = ["00_ct_crosswalk.py", "01_counties.py", "01b_housing_by_year.py", "02_tracks.py", "03_storm_county.py",
+STEPS = ["00_ct_crosswalk.py", "01_counties.py", "01b_census_by_year.py", "01c_ag_by_year.py", "02_tracks.py", "03_storm_county.py",
          "04_loss_records.py", "05_losses.py", "06_final_tables.py", "07_county_year.py",
          "data_dictionary.py"]
 

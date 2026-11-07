@@ -12,3 +12,11 @@
 | `Housing_2000_2010.csv` | Census county housing unit estimates, 2000-2010 intercensal: https://www.census.gov/programs-surveys/popest/data/data-sets.html | 2026-10-28 | Has county codes |
 | `Housing_2010_2020.xlsx` | Census CO-EST2020INT-HU, 2010-2020 intercensal (Nov 2024 release) | 2026-10-28 | County names only; Connecticut old counties |
 | `Housing_2020_2025.xlsx` | Census CO-EST2025-HU, 2020-2025 (May 2026 release) | 2026-10-28 | County names only; Connecticut planning regions |
+| `population2000_2010.csv` | Census county population, 2000-2010 intercensal (co-est00int): https://www.census.gov/data/datasets/time-series/demo/popest/intercensal-2000-2010-counties.html | 2026-11-06 | Has county codes; used in step 01b |
+| `population2010_2020.xlsx` | Census CO-EST2020INT-POP, 2010-2020 intercensal: https://www.census.gov/data/datasets/time-series/demo/popest/intercensal-2010-2020-counties.html | 2026-11-06 | County names only; Connecticut old counties |
+| `population2020_2025.xlsx` | Census CO-EST2025-POP, 2020-2025: https://www.census.gov/data/datasets/time-series/demo/popest/2020s-counties-total.html | 2026-11-06 | County names only; Connecticut planning regions |
+| `USDA_farmvalue.csv` | USDA NASS Quick Stats (https://quickstats.nass.usda.gov), Program CENSUS, County, Domain TOTAL, years 2002-2022, Data Item `COMMODITY TOTALS - SALES, MEASURED IN $` | 2026-11-06 | Used in step 01c; (D) = withheld |
+| `USDA_cropvalue.csv` | USDA NASS Quick Stats (https://quickstats.nass.usda.gov), Program CENSUS, County, Domain TOTAL, years 2002-2022, Data Item `CROP TOTALS - SALES, MEASURED IN $` | 2026-11-06 | Used in step 01c |
+| `USDA_croplandacres.csv` | USDA NASS Quick Stats (https://quickstats.nass.usda.gov), Program CENSUS, County, Domain TOTAL, years 2002-2022, Data Item `AG LAND, CROPLAND - ACRES` | 2026-11-06 | Used in step 01c |
+| `USDA_woodlandacres.csv` | USDA NASS Quick Stats (https://quickstats.nass.usda.gov), Program CENSUS, County, Domain TOTAL, years 2002-2022, Data Item `AG LAND, WOODLAND - ACRES` | 2026-11-06 | Used in step 01c; farm woodland only, not all forest |
+| `USDA_forestproduct.csv` | USDA NASS Quick Stats, Census, County, Sector ECONOMICS > INCOME > INCOME, FARM-RELATED, Data Item `...FOREST PRODUCTS... - RECEIPTS, MEASURED IN $` | 2026-11-06 | Used in step 01c; farm timber only, 24% withheld |

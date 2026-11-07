@@ -78,8 +78,14 @@ county_year,state,,State abbreviation,FEMA NRI
 county_year,county_name,,County name (Connecticut: 2022 planning regions),FEMA NRI
 county_year,year,,Hurricane season year,NOAA HURDAT2
 county_year,has_labels,,"True for 1996-2024, the years with damage records; damage is blank when False",derived
+county_year,population,people,"Resident population that year (Census estimates, July 1); blank before 2000",Census population estimates
 county_year,housing_units,units,"Housing units that year (Census estimates, July 1); blank before 2000",Census housing unit estimates
 county_year,bldg_value_usd2023,USD (2023),Building value that year = FEMA value per 2020 housing unit x that year's housing units; blank before 2000,derived from FEMA NRI + Census
+county_year,farm_value_usd2023,USD (2023),"Farm sales that year, crops + livestock (USDA census every 5 yrs, straight line between); blank before 2000",USDA Census of Agriculture
+county_year,crop_value_usd2023,USD (2023),Crop sales that year (same method); blank before 2000,USDA Census of Agriculture
+county_year,forest_value_usd2023,USD (2023),Timber sold from farm woodland that year (same method; ~24% withheld and filled); blank before 2000,USDA Census of Agriculture
+county_year,cropland_acres,acres,"Cropland on farms that year (x 4,046.86 = square meters); blank before 2000",USDA Census of Agriculture
+county_year,woodland_acres,acres,Woodland on farms that year; blank before 2000,USDA Census of Agriculture
 county_year,max_wind_ms,m/s,Strongest estimated wind from any storm that year; 0 if none within 500 km,derived
 county_year,hurricane_hit,,max_wind_ms >= 32.9 m/s (64 kt),derived
 county_year,ts_hit,,max_wind_ms >= 17.5 m/s (34 kt),derived

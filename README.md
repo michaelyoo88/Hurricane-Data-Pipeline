@@ -28,7 +28,7 @@ df = model_table()          # labeled storm x county rows + exposure + damage ra
 |---|---|
 | 00 ct_crosswalk | Connecticut's old counties -> 2022 planning regions (by population) |
 | 01 counties | Master county list (contiguous US + DC), where people live, exposure, FEMA's hurricane numbers |
-| 01b housing_by_year | Housing units per county per year (Census, 2000-2024) and building value per year = FEMA value per 2020 unit x units |
+| 01b census_by_year | Housing units and population per county per year (Census, 2000-2024) and building value per year = FEMA value per 2020 unit x units |
 | 02 tracks | HURDAT2 storms 1975-2025, filled in to hourly; storm size from the Willoughby (2006) formula |
 | 03 storm_county | Every storm x county within 500 km: closest distance, estimated peak wind, time window |
 | 04 loss_records | NY Fed hurricane damage: one weighting scheme, fixed county codes, 2023 dollars |
