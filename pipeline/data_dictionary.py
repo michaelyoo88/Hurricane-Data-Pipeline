@@ -105,10 +105,21 @@ DESCRIPTIONS = {
     ("county_year", "deaths_direct"): ("people", "Recorded direct deaths that year", NYFED),
     ("county_year", "injuries_direct"): ("people", "Recorded direct injuries that year", NYFED),
     ("county_year", "pop_loss_usd2023"): ("USD", "(deaths + injuries/10) x $13.7M (FEMA's value of a life)", "derived"),
+    # county_stats_by_year (2000-2024 only, so nothing is blank)
+    ("county_stats_by_year", "population"): ("people", "Resident population that year (Census estimates, July 1)", "Census population estimates"),
+    ("county_stats_by_year", "housing_units"): ("units", "Housing units that year (Census estimates, July 1)", "Census housing unit estimates"),
+    ("county_stats_by_year", "density_per_sqmi"): ("people/sq mi", "That year's population / land area", "derived"),
+    ("county_stats_by_year", "bldg_value_usd2023"): (USD, "Building value that year (all buildings, not just homes) = FEMA value per 2020 housing unit x that year's housing units", "derived from FEMA NRI + Census"),
+    ("county_stats_by_year", "farm_value_usd2023"): (USD, "Farm sales that year, crops + livestock (USDA census every 5 yrs, straight line between)", "USDA Census of Agriculture"),
+    ("county_stats_by_year", "crop_value_usd2023"): (USD, "Crop sales that year (same method)", "USDA Census of Agriculture"),
+    ("county_stats_by_year", "forest_value_usd2023"): (USD, "Timber sold from farm woodland that year (same method; ~24% withheld and filled)", "USDA Census of Agriculture"),
+    ("county_stats_by_year", "farm_timber_value_usd2023"): (USD, "Farm sales + timber sales: exposure weight for the crop model", "derived"),
+    ("county_stats_by_year", "cropland_acres"): ("acres", "Cropland on farms that year", "USDA Census of Agriculture"),
+    ("county_stats_by_year", "woodland_acres"): ("acres", "Woodland on farms that year", "USDA Census of Agriculture"),
 }
 
 rows = []
-for table in ["storm_county", "storms", "counties", "storm_tracks", "county_year"]:
+for table in ["storm_county", "storms", "counties", "storm_tracks", "county_year", "county_stats_by_year"]:
     df = pd.read_csv(FINAL / f"{table}.csv", nrows=50_000, low_memory=False)
     for col in df.columns:
         entry = DESCRIPTIONS.get((table, col)) or DESCRIPTIONS.get(("*", col)) \

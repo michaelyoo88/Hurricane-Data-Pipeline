@@ -20,7 +20,8 @@ FINAL.mkdir(exist_ok=True)
 STORM_YEARS = (1975, 2025)   # storms kept from HURDAT2 (satellite era onward)
 LABEL_YEARS = (1996, 2024)   # years with damage records (2025 is incomplete in our download: 11 records, $0)
 DOLLAR_YEAR = 2023           # every dollar amount is converted to this year
-NRI_DOLLAR_YEAR = 2023       # TODO: confirm the year in FEMA's NRI documentation
+NRI_DOLLAR_MONTH = "2024-12"  # NRI v1.20 (Dec 2025): building, population and ag values are
+                              # "inflation adjusted to December 2024 dollars" (FEMA NRI metadata)
 
 # ---- Distances ---------------------------------------------------------------
 MATCH_RADIUS_KM = 500   # a storm "reaches" a county if its center passes this close
@@ -69,6 +70,17 @@ def cpi_factors():
     by_year = cpi.groupby("year")["CPIAUCSL"]
     yearly = by_year.mean()[by_year.size() == 12]
     return yearly[DOLLAR_YEAR] / yearly
+
+
+def cpi_month_factor(month):
+    """Multiply dollars of one month (e.g. "2024-12") by this to get DOLLAR_YEAR dollars.
+    For sources like FEMA's NRI that state their dollars as of a single month."""
+    cpi = pd.read_csv(SOURCE / "cpi_monthly.csv")
+    cpi["year"] = cpi["observation_date"].str[:4].astype(int)
+    base = cpi.loc[cpi.year == DOLLAR_YEAR, "CPIAUCSL"].mean()
+    month_cpi = cpi.loc[cpi.observation_date.str[:7] == month, "CPIAUCSL"]
+    assert len(month_cpi) == 1, f"no CPI value for {month}"
+    return base / month_cpi.iloc[0]
 
 
 def willoughby_rmax_km(vmax_ms, lat):

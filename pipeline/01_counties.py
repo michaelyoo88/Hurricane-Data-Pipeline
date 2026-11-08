@@ -21,7 +21,8 @@ def number(col):
     return pd.to_numeric(nri[col], errors="coerce")
 
 
-to_2023 = cpi_factors()[NRI_DOLLAR_YEAR]   # 1.0 while NRI_DOLLAR_YEAR is 2023
+# NRI dollars are December 2024 dollars; convert to 2023 dollars like every other source
+to_2023 = cpi_month_factor(NRI_DOLLAR_MONTH)   # about 0.959
 
 counties = pd.DataFrame({
     "fips": nri.fips,
