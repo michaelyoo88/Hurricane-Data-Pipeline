@@ -29,6 +29,8 @@ df = model_table()          # labeled storm x county rows + exposure + damage ra
 | 00 ct_crosswalk | Connecticut's old counties -> 2022 planning regions (by population) |
 | 01 counties | Master county list (contiguous US + DC), where people live, exposure, FEMA's hurricane numbers |
 | 01b census_by_year | Housing units and population per county per year (Census, 2000-2024) and building value per year = FEMA value per 2020 unit x units |
+| 01c ag_by_year | Farm, crop and timber sales and cropland/woodland acres per county per year (USDA Census of Agriculture, straight line between census years) |
+| 01d county_stats | One table of yearly county stats (population, housing, building value, farm/crop/timber value, cropland, woodland), 2000-2024 |
 | 02 tracks | HURDAT2 storms 1975-2025, filled in to hourly; storm size from the Willoughby (2006) formula |
 | 03 storm_county | Every storm x county within 500 km: closest distance, estimated peak wind, time window |
 | 04 loss_records | NY Fed hurricane damage: one weighting scheme, fixed county codes, 2023 dollars |
@@ -46,6 +48,7 @@ df = model_table()          # labeled storm x county rows + exposure + damage ra
 | `counties.csv` | county | 3,109 |
 | `storm_tracks.csv` | storm x hour | 133,061 |
 | `county_year.csv` | county x year | 158,559 |
+| `county_stats_by_year.csv` | county x year, 2000-2024: exposure stats only, nothing blank | 77,725 |
 
 ## Things to know
 
@@ -54,5 +57,5 @@ df = model_table()          # labeled storm x county rows + exposure + damage ra
 - Damage is **0** in years with records (1996-2024) and **blank** before 1996. Never fill blanks with 0.
 - Damage covers wind-type events only (hurricane, tropical storm, tropical depression). Storm surge and flooding are separate FEMA hazards, which is why Harvey and Helene look small.
 - Wind estimate: modified Rankine vortex, storm size from Willoughby, Darling & Rahn (2006), peak over all hours.
-- Building value varies by year (2000-2024) via Census housing units; farm value and population are still single snapshots from FEMA's NRI.
+- Exposure varies by year (2000-2024): population and housing from Census estimates, building value = FEMA value per 2020 housing unit x that year's units, farm/crop/timber value and acres from the USDA census (every 5 years, straight line between). All in `county_stats_by_year.csv`.
 - Settings (years, radius, dollar year, seed) are in `pipeline/common.py`.
