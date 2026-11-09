@@ -33,7 +33,7 @@ df = model_table()          # labeled storm x county rows + exposure + damage ra
 | 01d county_stats | One table of yearly county stats (population, housing, building value, farm/crop/timber value, cropland, woodland), 2000-2024 |
 | 02 tracks | HURDAT2 storms 1975-2025, filled in to hourly; storm size from the Willoughby (2006) formula |
 | 03 storm_county | Every storm x county within 500 km: closest distance, estimated peak wind, time window |
-| 04 loss_records | NY Fed hurricane damage: one weighting scheme, fixed county codes, 2023 dollars |
+| 04 loss_records | NY Fed hurricane + storm surge/coastal flood damage: one weighting scheme, fixed county codes, 2023 dollars |
 | 05 losses | Match each damage record to its storm (closest within 500 km on those dates), then add up |
 | 06 final_tables | Publish `storm_county`, `storms`, `counties`, `storm_tracks` |
 | 07 county_year | One row per county per year: max wind, hit, hit probability, damage |
@@ -55,7 +55,7 @@ df = model_table()          # labeled storm x county rows + exposure + damage ra
 - `fips` is text; use `load()` or `dtype={"fips": str}` so leading zeros survive.
 - Money ending `_usd2023` is in 2023 dollars.
 - Damage is **0** in years with records (1996-2024) and **blank** before 1996. Never fill blanks with 0.
-- Damage covers wind-type events only (hurricane, tropical storm, tropical depression). Storm surge and flooding are separate FEMA hazards, which is why Harvey and Helene look small.
+- Damage covers hurricane / tropical storm / depression records plus storm surge and coastal flood records (surge matched with a tighter rule: storm within 200 km and tropical-storm wind or within 100 km). `prop_dmg_surge_usd2023` holds the surge part. Inland/rain flooding is not included, which is why Harvey still looks small. Note FEMA's NRI treats coastal flooding as a separate hazard from hurricane.
 - Wind estimate: modified Rankine vortex, storm size from Willoughby, Darling & Rahn (2006), peak over all hours.
 - Exposure varies by year (2000-2024): population and housing from Census estimates, building value = FEMA value per 2020 housing unit x that year's units, farm/crop/timber value and acres from the USDA census (every 5 years, straight line between). All in `county_stats_by_year.csv`.
 - Settings (years, radius, dollar year, seed) are in `pipeline/common.py`.

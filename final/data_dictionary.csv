@@ -15,7 +15,7 @@ storm_county,hours_within_100km,hours,Hours the storm center spent within 100 km
 storm_county,time_at_min_utc,UTC,Time of closest approach,NOAA HURDAT2
 storm_county,enter_500km_utc,UTC,First hour within 500 km,NOAA HURDAT2
 storm_county,exit_500km_utc,UTC,Last hour within 500 km,NOAA HURDAT2
-storm_county,prop_dmg_usd2023,USD (2023),Recorded property damage,NY Fed Losses from Natural Disasters
+storm_county,prop_dmg_usd2023,USD (2023),Recorded property damage: hurricane/tropical storm records + storm surge/coastal flood records,NY Fed Losses from Natural Disasters
 storm_county,crop_dmg_usd2023,USD (2023),Recorded crop damage (includes timber),NY Fed Losses from Natural Disasters
 storm_county,crop_dmg_area_usd2023,USD (2023),Crop damage split by land area instead of housing (sensitivity check),NY Fed Losses from Natural Disasters
 storm_county,injuries_direct,people,Direct injuries (can be fractional: zone totals split across counties),NY Fed Losses from Natural Disasters
@@ -24,6 +24,8 @@ storm_county,deaths_direct,people,Direct deaths (can be fractional),NY Fed Losse
 storm_county,deaths_indirect,people,Indirect deaths,NY Fed Losses from Natural Disasters
 storm_county,n_loss_records,count,Damage records added up into this row,derived
 storm_county,n_ambiguous_records,count,"Of those, records where another storm also qualified",derived
+storm_county,prop_dmg_surge_usd2023,USD (2023),Part of prop_dmg_usd2023 from storm surge / coastal flood records (wind-only = difference),NY Fed Losses from Natural Disasters
+storm_county,n_surge_records,count,"Of the damage records, how many are storm surge / coastal flood",derived
 storms,storm_id,,"Storm id: basin + number + year, e.g. AL092022 = Ian",NOAA HURDAT2
 storms,name,,Storm name,NOAA HURDAT2
 storms,year,,Hurricane season year,NOAA HURDAT2

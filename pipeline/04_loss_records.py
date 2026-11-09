@@ -5,7 +5,9 @@ The NY Fed file (13.5M rows, 1.3 GB) has one row per weather event x county x
 split a forecast zone's damage across counties - so we must keep only ONE scheme
 per number, or we'd count every dollar 6 times.
 
-Steps: keep hurricane / tropical storm / tropical depression events, fix county
+Steps: keep hurricane / tropical storm / tropical depression events, plus storm
+surge and coastal flood records (flagged source = "surge"; step 05 matches them to a
+storm with a tighter rule), fix county
 codes that lost their leading zero, move Connecticut to planning regions, keep the
 contiguous US, and convert dollars to 2023 dollars.
 
@@ -23,7 +25,8 @@ WEIGHTS = [PROPERTY_WEIGHT, PEOPLE_WEIGHT, CROP_CHECK_WEIGHT]
 chunks = []
 for chunk in pd.read_csv(SOURCE / "nyc_fed_losses.csv", usecols=COLUMNS, chunksize=2_000_000,
                          dtype={"fips": str, "event_id": str, "episode_id": str}):
-    keep = (chunk.disaster_group == "Hurricane/Tropical Storm") & chunk.weight_type.isin(WEIGHTS)
+    hurricane_type = (chunk.disaster_group == WIND_GROUP) | chunk.event_type.isin(SURGE_TYPES)
+    keep = hurricane_type & chunk.weight_type.isin(WEIGHTS)
     chunks.append(chunk[keep])
 raw = pd.concat(chunks, ignore_index=True)
 raw["fips"] = raw.fips.str.zfill(5)          # "1001" -> "01001"
@@ -65,8 +68,11 @@ factor = records.year.map(cpi_factors())
 for col in ["prop_dmg", "crop_dmg", "crop_dmg_area"]:
     records[f"{col}_2023"] = records[f"{col}_nominal"] * factor
 
+records["source"] = records.event_type.isin(SURGE_TYPES).map({True: "surge", False: "wind"})
 records["record_id"] = records.event_id + "_" + records.fips
 assert records.record_id.is_unique
 records.to_csv(CLEAN / "loss_records.csv", index=False)
-print(f"04 loss_records: {len(records):,} records, "
-      f"${records.prop_dmg_2023.sum() / 1e9:.1f}B property damage (2023 $)")
+by_source = records.groupby("source").prop_dmg_2023.sum() / 1e9
+print(f"04 loss_records: {len(records):,} records, ${records.prop_dmg_2023.sum() / 1e9:.1f}B property damage "
+      f"(2023 $; wind ${by_source.get('wind', 0):.1f}B, surge/coastal flood ${by_source.get('surge', 0):.1f}B, "
+      f"before matching)")

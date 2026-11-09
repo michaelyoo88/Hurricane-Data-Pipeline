@@ -33,7 +33,8 @@ fact.insert(4, "has_labels", has_labels(fact.year))
 fact.loc[fact.has_labels, DAMAGE] = fact.loc[fact.has_labels, DAMAGE].fillna(0)
 fact.loc[~fact.has_labels, DAMAGE] = np.nan
 fact = fact.rename(columns={"prop_dmg_2023": "prop_dmg_usd2023", "crop_dmg_2023": "crop_dmg_usd2023",
-                            "crop_dmg_area_2023": "crop_dmg_area_usd2023"})
+                            "crop_dmg_area_2023": "crop_dmg_area_usd2023",
+                            "prop_dmg_surge_2023": "prop_dmg_surge_usd2023"})
 
 # ---- storms: one row per storm ----
 g = tracks_6h.groupby("storm_id")

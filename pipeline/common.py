@@ -42,6 +42,13 @@ DROP_STATES = {"02", "15", "60", "66", "69", "72", "78"}
 # Connecticut's 8 old county codes (used by the NY Fed and Census 2020)
 CT_OLD_COUNTIES = {"09001", "09003", "09005", "09007", "09009", "09011", "09013", "09015"}
 
+# Which NY Fed damage records count as hurricane damage
+WIND_GROUP = "Hurricane/Tropical Storm"            # hurricane, tropical storm, tropical depression
+SURGE_TYPES = ["Storm Surge/Tide", "Coastal Flood"]  # water pushed ashore by the storm (added 2026-11-08)
+SURGE_MAX_KM = 200   # surge/coastal-flood records need a closer storm: within 200 km AND
+                     # tropical-storm wind at the county or the storm within NEAR_KM.
+                     # Inland/rain flooding is NOT included (no rainfall feature yet).
+
 # NY Fed splits each zone's damage across counties several ways; we use:
 PROPERTY_WEIGHT = "Housing"     # property and crop damage follow where houses are
 PEOPLE_WEIGHT = "Population"    # deaths and injuries follow where people are
