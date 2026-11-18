@@ -1,0 +1,13 @@
+category,storm_strength,storms,recorded_B,predicted_B,pred_over_recorded,typical_storm_factor
+property,Cat 1-2,32,100.473,88.344,0.879,6.014
+property,Cat 3+,15,298.352,92.456,0.31,0.689
+property,TD / TS,147,11.654,24.595,2.11,68.487
+crop,Cat 1-2,32,3.73,3.177,0.852,1.76
+crop,Cat 3+,15,12.408,12.689,1.023,3.672
+crop,TD / TS,147,0.145,0.545,3.766,2.843
+people,Cat 1-2,32,3.902,5.083,1.303,1.96
+people,Cat 3+,15,20.068,7.778,0.388,1.292
+people,TD / TS,147,1.11,2.534,2.283,1.319
+total,Cat 1-2,32,108.105,96.604,0.894,4.015
+total,Cat 3+,15,330.828,112.923,0.341,0.68
+total,TD / TS,147,12.909,27.673,2.144,33.755

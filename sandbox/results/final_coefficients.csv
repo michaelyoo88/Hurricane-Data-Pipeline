@@ -1,0 +1,6 @@
+feature,chance,size
+intercept,-3.771,-9.778
+wind_cap,1.135,0.724
+coastal_x_wind_cap,-0.137,0.094
+log_dist_km,-0.466,-0.164
+coastal,0.053,-0.192

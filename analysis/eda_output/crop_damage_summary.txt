@@ -1,0 +1,101 @@
+All NOAA crop-damage records 1996-2024 (contiguous US, Housing split): 42,778, $99.2B (2023 $)
+
+By disaster group (all records, hurricane-related or not):
+                          records  crop_B  share
+disaster_group                                  
+Drought                      7217  43.406  0.438
+Hurricane/Tropical Storm     1169  18.059  0.182
+Flood                        8241  14.243  0.144
+Winter Weather               2986  10.522  0.106
+Hail                        10062   5.665  0.057
+Wind                        10273   3.746  0.038
+Thunderstorm/Rain             354   1.418  0.014
+Wildfire                      314   0.774  0.008
+Heat                           80   0.762  0.008
+Tornado                      2016   0.567  0.006
+Other                          64   0.042  0.000
+Coastal                         2   0.001  0.000
+
+Hurricane-related (matched to a storm, EXTRA_MAX_KM rule): 1,684 records, $21.1B (21% of all US crop damage)
+  captured by our labels (hurricane group + all EXTRA_TYPES): $20.4B; pipeline storm_county has $20.7B (step 05 rule for wind records is looser, so may differ)
+  NOT captured (other event types during hurricanes): $0.7B
+
+Hurricane-related crop $ by event type:
+         event_type  in_labels  records  crop_B  storms  share_of_hurricane_crop
+          Hurricane       True      658  15.738      30                    0.744
+     Tropical Storm       True      289   1.637      25                    0.077
+        Flash Flood       True      151   1.207      25                    0.057
+              Flood       True      157   0.964      18                    0.046
+          High Wind       True      252   0.761      13                    0.036
+            Drought      False      102   0.711      11                    0.034
+        Strong Wind       True       24   0.119       4                    0.006
+         Heavy Rain      False        4   0.005       1                    0.000
+            Tornado       True       38   0.004      16                    0.000
+Tropical Depression       True        1   0.001       1                    0.000
+               Heat      False        2   0.000       1                    0.000
+               Hail      False        5   0.000       3                    0.000
+        Debris Flow      False        1   0.000       1                    0.000
+
+By state (top 12):
+       crop_B  captured_B  missed_B
+state                              
+FL       6.85        6.85      0.00
+GA       4.87        4.73      0.14
+NC       4.20        4.20      0.00
+MS       2.26        2.26      0.00
+LA       1.03        1.02      0.00
+TX       0.80        0.80      0.01
+VA       0.30        0.27      0.03
+MO       0.21        0.00      0.21
+SC       0.12        0.12      0.00
+NY       0.09        0.00      0.09
+NJ       0.09        0.01      0.07
+AL       0.09        0.09      0.00
+
+By storm (top 15):
+              name  crop_B  captured_B main_missed_type  missed_B
+storm_id                                                         
+AL142018   MICHAEL    5.32        5.32                       0.00
+AL122005   KATRINA    2.96        2.96                       0.00
+AL081999     FLOYD    2.10        1.97          Drought      0.13
+AL092024    HELENE    1.55        1.55                       0.00
+AL131999     IRENE    1.15        1.15                       0.00
+AL112017      IRMA    0.81        0.81                       0.00
+AL032004   CHARLEY    0.74        0.74                       0.00
+AL092011     IRENE    0.55        0.55                       0.00
+AL042008     DOLLY    0.48        0.47       Heavy Rain      0.00
+AL062018  FLORENCE    0.47        0.47                       0.00
+AL021998    BONNIE    0.46        0.46                       0.00
+AL062004   FRANCES    0.46        0.46                       0.00
+AL072008    GUSTAV    0.43        0.43                       0.00
+AL061996      FRAN    0.35        0.35                       0.00
+AL102023    IDALIA    0.34        0.34                       0.00
+
+By year:
+      crop_B  captured_B  missed_B
+year                              
+1996    0.67        0.67      0.00
+1997    0.01        0.01      0.00
+1998    0.57        0.57      0.00
+1999    3.50        3.20      0.30
+2000    0.00        0.00      0.00
+2002    0.29        0.29      0.00
+2003    0.09        0.09      0.00
+2004    1.46        1.46      0.00
+2005    3.12        3.12      0.00
+2006    0.07        0.07      0.00
+2008    1.22        1.21      0.01
+2010    0.03        0.02      0.00
+2011    0.69        0.55      0.14
+2012    0.27        0.00      0.27
+2014    0.00        0.00      0.00
+2015    0.00        0.00      0.00
+2016    0.15        0.15      0.00
+2017    0.90        0.90      0.00
+2018    5.79        5.79      0.00
+2019    0.00        0.00      0.00
+2020    0.32        0.32      0.00
+2021    0.02        0.02      0.00
+2022    0.00        0.00      0.00
+2023    0.34        0.34      0.00
+2024    1.66        1.66      0.00

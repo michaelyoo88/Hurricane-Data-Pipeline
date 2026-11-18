@@ -1,0 +1,5 @@
+model,ours_B,fema_B,rank_corr,high_risk_counties,typical_gap_x,within_3x,median_ours_over_fema,share_ours_above
+y4,12.186,10.858,0.927,554,2.61,0.574,0.532,0.273
+k12,12.274,10.858,0.926,554,2.571,0.583,0.523,0.28
+y4_wind,7.228,10.858,0.911,535,2.712,0.544,0.414,0.193
+recorded,16.419,10.858,0.743,576,10.373,0.22,0.209,0.337

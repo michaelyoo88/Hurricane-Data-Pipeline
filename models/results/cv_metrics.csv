@@ -1,0 +1,5 @@
+category,recorded_B,predicted_B,pr_auc_any_damage,base_rate,rank_corr_county_year,pred_over_recorded,pred_over_recorded_95ci,typical_storm_factor,typical_storm_factor_95ci,rank_corr_storms,rank_corr_storms_95ci,pred_over_recorded_without_top3,top3_storms,top3_share_of_recorded
+property,410.479,205.395,0.369,0.057,0.347,0.5,0.26 to 1.07,19.001,7.34 to 39.76,0.834,0.78 to 0.88,0.997,"Katrina 2005, Harvey 2017, Sandy 2012",0.517
+crop,16.283,16.411,0.137,0.009,0.161,1.008,0.54 to 2.58,2.804,1.23 to 5.25,0.643,0.56 to 0.72,2.176,"Michael 2018, Katrina 2005, Helene 2024",0.616
+people,25.08,15.395,0.101,0.007,0.175,0.614,0.26 to 1.98,1.749,1.21 to 3.07,0.727,0.65 to 0.78,1.514,"Katrina 2005, Ian 2022, Charley 2004",0.644
+total,451.842,237.2,0.351,0.058,0.376,0.525,0.29 to 1.03,8.799,4.85 to 18.64,0.836,0.77 to 0.88,1.034,"Katrina 2005, Harvey 2017, Sandy 2012",0.511

@@ -1,0 +1,9 @@
+model,d2,d2_95ci,d2_minus_ref,diff_95ci,clearly_different,pred_rec,pred_rec_95ci,tier_miss,tier_miss_95ci
+K0 J2 reference (4 inputs),0.82,0.74 to 0.86,0.0,+0.000 to +0.000,False,0.914,0.48 to 2.02,1.148,1.16 to 3.38
+K1 asymmetric wind,0.823,0.76 to 0.85,0.003,-0.016 to +0.037,False,0.895,0.47 to 1.94,1.225,1.16 to 3.56
+"K2 Tweedie GLM, one equation",0.81,0.72 to 0.86,-0.01,-0.028 to +0.003,False,2.376,1.13 to 5.45,1.933,1.40 to 5.37
+K4b Emanuel curve + floor,0.795,0.69 to 0.85,-0.025,-0.067 to -0.002,True,1.006,0.53 to 2.15,1.627,1.22 to 4.53
+K5 J2 + region,0.784,0.74 to 0.83,-0.036,-0.072 to +0.013,False,0.64,0.33 to 1.37,1.408,1.21 to 3.43
+K6 J2 + latitude,0.812,0.70 to 0.87,-0.008,-0.041 to +0.011,False,1.006,0.51 to 2.27,1.134,1.15 to 3.15
+K9 average: J2 + by type,0.823,0.74 to 0.87,0.003,-0.008 to +0.008,False,0.962,0.54 to 2.02,1.089,1.15 to 3.14
+K12 average: J2+lat + by type,0.822,0.73 to 0.87,0.002,-0.009 to +0.009,False,1.008,0.55 to 2.14,1.111,1.15 to 3.06

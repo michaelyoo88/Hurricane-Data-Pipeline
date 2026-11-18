@@ -1,0 +1,13 @@
+category,model,our_eal_B,recorded_avg_B,fema_B,rank_corr_vs_recorded,rank_corr_vs_fema
+crop,basic_two_part,0.642,0.651,0.438,0.428,0.92
+crop,table_dollar,0.636,0.651,0.438,0.417,0.914
+crop,table_storm_avg,1.225,0.651,0.438,0.422,0.912
+people,basic_two_part,0.698,1.003,0.645,0.492,0.937
+people,table_dollar,1.167,1.003,0.645,0.482,0.927
+people,table_storm_avg,0.959,1.003,0.645,0.483,0.926
+property,basic_two_part,9.308,16.419,10.858,0.766,0.933
+property,table_dollar,18.43,16.419,10.858,0.783,0.923
+property,table_storm_avg,28.662,16.419,10.858,0.778,0.927
+total,basic_two_part,10.648,18.074,11.941,0.787,0.936
+total,table_dollar,20.233,18.074,11.941,0.797,0.924
+total,table_storm_avg,30.846,18.074,11.941,0.795,0.928

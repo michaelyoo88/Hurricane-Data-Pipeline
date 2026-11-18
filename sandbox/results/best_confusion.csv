@@ -1,0 +1,4 @@
+model,cutoff,true_pos,false_pos,false_neg,true_neg,accuracy,precision,recall,specificity,roc_auc,pr_auc,base_rate,recall_strong_wind
+"Logistic, 4 inputs (J2)",0.2437,2406,3110,3110,88553,0.936,0.4362,0.4362,0.9661,0.9173,0.4144,0.0568,1.0
+"Logistic, 4 inputs + latitude (K12)",0.2475,2382,3134,3134,88529,0.9355,0.4318,0.4318,0.9658,0.9194,0.4146,0.0568,1.0
+"XGBoost, rich inputs (best model, Y4)",0.3481,2601,2915,2915,88748,0.94,0.4715,0.4715,0.9682,0.9321,0.456,0.0568,0.8761

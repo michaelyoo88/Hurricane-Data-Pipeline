@@ -1,0 +1,9 @@
+model,pr_auc,pr_auc_chance,storm_rank_corr,pred_over_recorded,eal_B_per_yr,ci_lo,ci_hi
+Two-part regression (baseline),0.462,0.119,0.836,0.525,10.648,0.3,1.1
+Damage table (wind bin x coast),0.473,0.119,0.845,0.965,20.233,0.54,2.0
+"Top-down (storm total, then split)",0.378,0.119,0.736,0.972,20.149,0.57,2.15
+Separate wind / surge / rain models,0.47,0.119,0.849,0.709,14.79,0.37,1.47
+"Two-part, big storms count more",0.497,0.119,0.855,0.667,13.584,0.38,1.41
+"Two-part, weighted by dollars",0.502,0.119,0.859,0.744,15.218,0.43,1.56
+Two-part + storm-tier correction,0.478,0.119,0.846,0.795,16.365,0.43,1.65
+County-year two-part,0.488,0.119,,1.407,26.229,,

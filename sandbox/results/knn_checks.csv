@@ -1,0 +1,9 @@
+check,score,metric
+A any damage: neighbor share,0.937,ROC-AUC
+B amount: neighbor median ratio,0.655,rank corr
+B amount: typical miss (x),3.901,factor
+A any damage: J2 model (held-out storms),0.889,ROC-AUC
+B amount: J2 model (held-out storms),0.324,rank corr
+A any damage: J2 + neighbors (rank average),0.95,ROC-AUC
+"A any damage, 25+ m/s rows: neighbor share",0.827,ROC-AUC
+"A any damage, 25+ m/s rows: J2 model",0.608,ROC-AUC

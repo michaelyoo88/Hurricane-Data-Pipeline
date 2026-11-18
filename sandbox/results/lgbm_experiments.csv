@@ -1,0 +1,4 @@
+round,model,d2,pred_rec,tier_ts,tier_c12,tier_c3,tier_miss,storm_miss,rho_storm,roc_auc,top10,within3x,d2_min,d2_max
+lgbm,H1 LightGBM monotone,0.7472,0.9042,1.2971,1.3876,0.6844,1.377,12.7363,0.8783,0.9126,0.9571,0.3578,0.7357,0.7558
+lgbm,H2 LightGBM monotone + storm + track,0.6474,0.4744,0.2309,0.5104,0.473,2.626,5.4547,0.8605,0.9213,0.8796,0.3791,0.632,0.6577
+lgbm,H3 LightGBM free (no constraints),0.7298,0.6374,0.4793,0.9187,0.5307,1.6262,12.6298,0.877,0.908,0.903,0.3835,0.7276,0.7326

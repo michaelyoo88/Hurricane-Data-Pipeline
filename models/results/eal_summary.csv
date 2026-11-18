@@ -1,0 +1,5 @@
+category,our_eal_B_per_yr,our_eal_95ci_B,recorded_avg_B_per_yr,fema_eal_B_per_yr,rank_corr_ours_vs_recorded,rank_corr_ours_vs_fema,log_corr_ours_vs_fema,counties_ours_gt0,counties_fema_gt0
+property,9.308,5.9 to 13.2,16.419,10.858,0.766,0.933,0.898,2560,2225
+crop,0.642,0.3 to 1.0,0.651,0.438,0.428,0.92,0.869,2521,2185
+people,0.698,0.4 to 1.1,1.003,0.645,0.492,0.937,0.839,2560,2220
+total,10.648,6.4 to 14.7,18.074,11.941,0.787,0.936,0.898,2560,2225

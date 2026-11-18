@@ -1,0 +1,122 @@
+RMA rows with an indemnity, crop years 2000-2024: 3,301,646; total indemnity $247.6B (2023 $)
+
+Top causes, all US, all years ($B, share):
+                                                            B  share
+cause_code cause                                                    
+11         Drought                                      86.14  0.348
+31         Excess Moisture/Precipitation/Rain           58.15  0.235
+21         Hail                                         15.05  0.061
+12         Heat                                         13.49  0.055
+01         Decline in Price                             11.97  0.048
+42         Freeze                                        7.02  0.028
+55         ARPI/SCO/ECO/STAX/MP/HIP-WI/PACE Crops Only   6.88  0.028
+61         Wind/Excess Wind                              4.98  0.020
+44         Cold Wet Weather                              4.58  0.018
+62         Hot Wind                                      4.13  0.017
+13         Failure of Irrigation Supply                  3.31  0.013
+92         Hurricane/Tropical Depression                 3.27  0.013
+55         GRP/GRIP  Crops Only`                         2.97  0.012
+           ARPI/SCO/ECO/STAX/MP/PACE Crops Only          2.81  0.011
+           ARPI/SCO/STAX/MP Crops Only                   2.73  0.011
+
+Hurricane-coded (codes 92/67/63): $3.43B (1.4% of all US indemnity); in contiguous-US named counties $3.42B; county code 999 ('all other counties') $11M
+
+Hurricane-coded by state ($B, top 10):
+state
+FL    1.57
+NC    0.72
+GA    0.53
+TX    0.16
+LA    0.14
+SC    0.12
+AL    0.11
+AR    0.02
+VA    0.02
+MS    0.01
+
+by crop ($B, top 12):
+commodity
+NURSERY (FG&C)        0.74
+COTTON                0.69
+FLUE CURED TOBACCO    0.44
+ORANGES               0.25
+SOYBEANS              0.21
+CORN                  0.15
+PEANUTS               0.13
+ALL OTHER CROPS       0.12
+PECANS                0.10
+RICE                  0.10
+CITRUS VII            0.09
+CITRUS II             0.06
+
+by month of loss ($B):
+month
+0.0     0.00
+1.0     0.02
+2.0     0.00
+3.0     0.01
+4.0     0.00
+5.0     0.03
+6.0     0.05
+7.0     0.12
+8.0     0.85
+9.0     1.42
+10.0    0.87
+11.0    0.04
+12.0    0.01
+
+Hurricane-coded $ that match a storm (county + year + month): 84% ($2.87B); ambiguous (2+ storms that month): 8.8% of matched rows
+Sensitivity causes (wind/flood/rain/tornado) inside storm footprints: $1.71B
+  by cause: Excess Moisture/Precipitation/Rain $1.36B, Wind/Excess Wind $0.25B, Flood $0.10B, Tornado $0.00B
+
+2000-2024 totals: NY Fed crop $16.3B vs RMA hurricane-coded (matched) $2.9B -> NY Fed / RMA = 5.68 overall; median storm ratio 3.00
+Storms with crop $ in: both 51, NY Fed only 4, RMA only 46
+Storm x county pairs with crop $ in: both 342, NY Fed only 496, RMA only 2,043
+
+By year ($B):
+        nyfed_crop_B  rma_hurricane_coded_B  rma_matched_main_B
+1999.0          0.00                   0.00                0.02
+2000.0          0.00                   0.00                0.00
+2001.0          0.00                   0.00                0.00
+2002.0          0.30                   0.00                0.00
+2003.0          0.09                   0.02                0.01
+2004.0          1.46                   0.34                0.33
+2005.0          3.27                   0.55                0.52
+2006.0          0.07                   0.04                0.03
+2007.0          0.00                   0.00                0.00
+2008.0          1.30                   0.14                0.08
+2009.0          0.00                   0.01                0.00
+2010.0          0.02                   0.01                0.00
+2011.0          0.55                   0.21                0.17
+2012.0          0.00                   0.01                0.00
+2013.0          0.00                   0.00                0.00
+2014.0          0.00                   0.01                0.01
+2015.0          0.00                   0.00                0.00
+2016.0          0.15                   0.07                0.06
+2017.0          0.90                   0.37                0.34
+2018.0          5.79                   0.55                0.51
+2019.0          0.00                   0.07                0.07
+2020.0          0.32                   0.24                0.19
+2021.0          0.02                   0.03                0.02
+2022.0          0.00                   0.32                0.30
+2023.0          0.34                   0.15                0.09
+2024.0          1.71                   0.15                0.09
+
+Top 15 storms by RMA hurricane indemnity ($M):
+              name  nyfed_crop_M  rma_main_M  rma_plus_sens_M  year  nyfed_over_rma
+storm_id                                                                           
+AL142018   MICHAEL        5324.7       337.2            375.3  2018            15.8
+AL112017      IRMA         814.0       299.2            367.6  2017             2.7
+AL092022       IAN           0.5       295.9            376.8  2022             0.0
+AL252005     WILMA         136.5       288.9            292.5  2005             0.5
+AL122005   KATRINA        3099.9       195.7            200.7  2005            15.8
+AL062018  FLORENCE         467.3       176.6            217.7  2018             2.6
+AL092011     IRENE         553.5       173.2            186.1  2011             3.2
+AL062004   FRANCES         459.4       131.3            149.0  2004             3.5
+AL032004   CHARLEY         744.3       123.7            134.6  2004             6.0
+AL102023    IDALIA         337.7        82.1            101.4  2023             4.1
+AL092020    ISAIAS           0.0        64.8             87.6  2020             0.0
+AL052019    DORIAN           0.1        57.5             62.7  2019             0.0
+AL192020     SALLY         108.4        50.5             57.9  2020             2.1
+AL142016   MATTHEW         141.6        48.2             72.4  2016             2.9
+AL112004    JEANNE         140.7        46.8             65.9  2004             3.0

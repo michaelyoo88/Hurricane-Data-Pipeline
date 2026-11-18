@@ -1,0 +1,6 @@
+rule,rows_flagged,storms,added_$B,added_pct_of_recorded,by_cluster_rows
+"25.0+ m/s, expected",223,42,3.026,0.737,"{'inland': 100, 'coastal': 123}"
+"25.0+ m/s, expected",223,42,3.026,0.737,"{'inland': 100, 'coastal': 123}"
+"25.0+ m/s, full",223,42,3.996,0.973,"{'inland': 100, 'coastal': 123}"
+"33.0+ m/s, expected",60,20,1.025,0.25,"{'inland': 25, 'coastal': 35}"
+"25.0+ m/s, expected",223,42,3.026,0.737,"{'inland': 100, 'coastal': 123}"

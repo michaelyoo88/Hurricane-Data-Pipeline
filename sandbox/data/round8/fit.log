@@ -1,0 +1,12 @@
+R0 K12 reference (current model): 3s
+T1 Tweedie GLM p=1.5: 1s
+T2 Tweedie GLM p=1.2: 1s
+T3 Tweedie GLM p=1.8: 4s
+T4 Tweedie GLM p=1.5 + recalibrated total: 2s
+T5 Tweedie GLM p=1.5, 7 capped inputs + recal: 2s
+G1 LightGBM, dollar weights (old H1 + lat): 8s
+G2 LightGBM, storm weights: 9s
+G3 LightGBM, storm weights + recal: 7s
+G4 LightGBM, p=1.3, 15 leaves, 200 rows/leaf + recal: 9s
+G5 LightGBM, rich inputs + recal: 8s
+Y1 Hybrid: XGBoost (rich) x gamma size: 7s

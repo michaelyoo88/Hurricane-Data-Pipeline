@@ -1,0 +1,4 @@
+model,true_pos,false_neg,false_pos,true_neg,accuracy,precision,recall,specificity,f1
+Always predict none,0,5516,0,91663,0.9432,0.0,0.0,1.0,0.0
+Naive: tropical-storm wind (17.5+ m/s),3168,2348,4737,86926,0.9271,0.4008,0.5743,0.9483,0.4721
+"Best model (cutoff 0.17, same number flagged)",3041,2475,4864,86799,0.9245,0.3847,0.5513,0.9469,0.4532

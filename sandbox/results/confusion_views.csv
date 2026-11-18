@@ -1,0 +1,13 @@
+view,model,cutoff,units,damage_rate,roc_auc,true_pos,false_neg,false_pos,true_neg,accuracy,precision,recall,specificity,f1
+"1 Storm x county, all",Naive: always 'no damage',,97179,0.0568,0.5,0,5516,0,91663,0.9432,,0.0,1.0,0.0
+"1 Storm x county, all","Best model, cutoff 0.5",0.5,97179,0.0568,0.9194,1172,4344,951,90712,0.9455,0.552,0.2125,0.9896,0.3068
+"1 Storm x county, all","Best model, balanced cutoff",0.2475,97179,0.0568,0.9194,2382,3134,3134,88529,0.9355,0.4318,0.4318,0.9658,0.4318
+"2 Storm x county, tropical-storm wind",Naive: always 'no damage',,7905,0.4008,0.5,0,3168,0,4737,0.5992,,0.0,1.0,0.0
+"2 Storm x county, tropical-storm wind","Best model, cutoff 0.5",0.5,7905,0.4008,0.6105,1170,1998,946,3791,0.6276,0.5529,0.3693,0.8003,0.4428
+"2 Storm x county, tropical-storm wind","Best model, balanced cutoff",0.39,7905,0.4008,0.6105,1588,1580,1580,3157,0.6003,0.5013,0.5013,0.6665,0.5013
+"3 County, all 3,109",Naive: always 'no damage',,3109,0.4548,0.5,0,1414,0,1695,0.5452,,0.0,1.0,0.0
+"3 County, all 3,109","Best model, cutoff 0.5",0.5,3109,0.4548,0.9549,1285,129,267,1428,0.8726,0.828,0.9088,0.8425,0.8665
+"3 County, all 3,109","Best model, balanced cutoff",0.5891,3109,0.4548,0.9549,1216,198,198,1497,0.8726,0.86,0.86,0.8832,0.86
+"4 County, felt tropical-storm wind",Naive: always 'damage',,1497,0.8377,0.5,1254,0,243,0,0.8377,0.8377,1.0,0.0,0.9117
+"4 County, felt tropical-storm wind","Best model, cutoff 0.5",0.5,1497,0.8377,0.8118,1194,60,195,48,0.8297,0.8596,0.9522,0.1975,0.9035
+"4 County, felt tropical-storm wind","Best model, balanced cutoff",0.6361,1497,0.8377,0.8118,1107,147,147,96,0.8036,0.8828,0.8828,0.3951,0.8828

@@ -1,0 +1,144 @@
+
+=== storm_county.csv: 164,592 rows x 32 columns; one row = one storm x one county within 500 km of its track (1975-2025)
+    rows in labeled years (damage known): 65%
+                     column      type  pct_filled  pct_nonzero                 min                 max  n_unique
+                   storm_id text/date       100.0          NaN            AL011976            AL292020       374
+                       fips text/date       100.0          NaN               01001               55141      2671
+                       year    number       100.0        100.0                1975                2025        51
+                      month    number       100.0        100.0                   1                  12         9
+                 has_labels    yes/no       100.0          NaN               False                True         2
+                min_dist_km    number       100.0        100.0                 0.2               500.0      4998
+             vmax_at_min_ms    number       100.0        100.0                5.14               77.17       388
+             rmax_km_at_min    number       100.0        100.0                21.1                92.9       644
+                wind_est_ms    number       100.0        100.0                3.62               69.45      3187
+             hours_ts_force    number       100.0          8.3                   0                  83        79
+      hours_hurricane_force    number       100.0          0.5                   0                  42        19
+              wind_exposure    number       100.0          8.2                 0.0              1147.7      1780
+         hours_within_100km    number       100.0         14.7                   0                  77        69
+            time_at_min_utc text/date       100.0          NaN 1975-06-27 00:00:00 2025-09-30 06:00:00     14151
+            enter_500km_utc text/date       100.0          NaN 1975-06-27 00:00:00 2025-09-30 05:00:00     19997
+             exit_500km_utc text/date       100.0          NaN 1975-06-27 09:00:00 2025-09-30 19:00:00     14250
+           prop_dmg_usd2023    number        65.1          3.8                 0.0  33843698795.754002      4887
+           crop_dmg_usd2023    number        65.1          0.6                 0.0       912031888.918       912
+      crop_dmg_area_usd2023    number        65.1          0.6                 0.0       897281696.989       912
+            injuries_direct    number        65.1          0.2                 0.0             695.717       220
+          injuries_indirect    number        65.1          0.0                 0.0            2400.376        18
+              deaths_direct    number        65.1          0.3                 0.0             622.908       260
+            deaths_indirect    number        65.1          0.1                 0.0                21.0        48
+             n_loss_records    number        65.1          7.2                 0.0                29.0        27
+        n_ambiguous_records    number        65.1          0.1                 0.0                 5.0         6
+prop_dmg_other_wind_usd2023    number        65.1          0.7                 0.0      2322572179.716      1020
+      prop_dmg_rain_usd2023    number        65.1          0.9                 0.0      12430719133.42      1009
+     prop_dmg_surge_usd2023    number        65.1          0.2                 0.0  27819600278.993999       332
+   prop_dmg_tornado_usd2023    number        65.1          0.3                 0.0       483234390.914       331
+     crop_dmg_extra_usd2023    number        65.1          0.2                 0.0       365826513.257       322
+        deaths_direct_extra    number        65.1          0.1                 0.0                36.0        69
+            n_extra_records    number        65.1          3.1                 0.0                27.0        24
+
+=== storms.csv: 839 rows x 15 columns; one row = one storm (HURDAT2, 1975-2025)
+    rows in labeled years (damage known): 59%
+              column      type  pct_filled  pct_nonzero                 min                  max  n_unique
+            storm_id text/date       100.0          NaN            AL011976             AL312020       839
+                name text/date       100.0          NaN             ALBERTO                 ZETA       236
+                year    number       100.0        100.0                1975                 2025        51
+           start_utc text/date       100.0          NaN 1975-01-04 12:00:00  2025-10-21 06:00:00       829
+             end_utc text/date       100.0          NaN 1975-01-09 00:00:00  2025-11-01 06:00:00       829
+        peak_vmax_ms    number       100.0        100.0               12.86                84.88        29
+         min_pmin_mb    number        87.8         87.8               882.0               1016.0       110
+       peak_category text/date       100.0          NaN                   1                   TS         7
+    n_counties_500km    number       100.0         44.6                   0                 1733       294
+    n_counties_100km    number       100.0         28.7                   0                  395       150
+   closest_county_km    number        44.6         44.6                 0.2                499.4       249
+obs_prop_dmg_usd2023    number        59.6         16.3                 0.0  115843922770.182999       138
+obs_crop_dmg_usd2023    number        59.6          8.1                 0.0       5324729383.695        69
+   obs_deaths_direct    number        59.6          8.7                 0.0               1004.0        34
+          has_labels    yes/no       100.0          NaN               False                 True         2
+
+=== counties.csv: 3,109 rows x 26 columns; one row = one county (contiguous US + DC; static, mostly 2020 / FEMA NRI)
+                    column      type  pct_filled  pct_nonzero                       min                   max  n_unique
+                      fips text/date       100.0          NaN                     01001                 56045      3109
+                     state text/date       100.0          NaN                        AL                    WY        49
+               county_name text/date       100.0          NaN                 Abbeville               Ziebach      1805
+                   pop_lat    number       100.0        100.0                    24.747                48.873      3109
+                   pop_lon    number       100.0        100.0                  -124.328               -67.466      3109
+                population    number       100.0        100.0                        64              10005712      3045
+        bldg_value_usd2023    number       100.0        100.0              54628595.673  1634520040068.978027      3109
+          ag_value_usd2023    number       100.0         98.6                       0.0        7093757415.601      3068
+                 area_sqmi    number       100.0        100.0                     2.067             20308.295      3109
+          density_per_sqmi    number       100.0        100.0                      0.09              49520.81      2771
+                   coastal    yes/no       100.0          NaN                     False                  True         2
+         nri_hrcn_n_events    number        76.9         62.5                       0.0                 196.0       132
+            nri_hrcn_afreq    number        76.9         72.9                       0.0                 0.459      2054
+ nri_hrcn_exp_bldg_usd2023    number        76.9         76.9              54628595.673  1634520040068.978027      2392
+          nri_hrcn_exp_pop    number        76.9         76.9                      64.0            10005712.0      2382
+   nri_hrcn_exp_ag_usd2023    number        76.9         75.7                       0.0        2289347177.397      2353
+         nri_hrcn_hlr_bldg    number        76.9         71.6                       0.0                 0.014      1962
+          nri_hrcn_hlr_pop    number        76.9         71.4                       0.0                   0.0      1430
+           nri_hrcn_hlr_ag    number        76.9         71.6                       0.0                 0.045      1936
+ nri_hrcn_eal_bldg_usd2023    number        76.9         71.6                       0.0         410659660.561      2226
+          nri_hrcn_eal_pop    number        76.9         71.4                       0.0                 2.138      2221
+ nri_hrcn_eal_pope_usd2023    number        76.9         71.4                       0.0           28107219.13      2221
+   nri_hrcn_eal_ag_usd2023    number        76.9         70.3                       0.0          15870118.278      2186
+nri_hrcn_eal_total_usd2023    number        76.9         71.6                       0.0         439261138.779      2226
+        nri_hrcn_eal_score    number        76.9         71.6                       0.0                 100.0      2226
+       nri_hrcn_eal_rating text/date       100.0          NaN No Expected Annual Losses              Very Low         7
+
+=== storm_tracks.csv: 133,061 rows x 8 columns; one row = one storm x one hour of its track
+  column      type  pct_filled  pct_nonzero                 min                 max  n_unique
+storm_id text/date       100.0          NaN            AL011976            AL312020       839
+time_utc text/date       100.0          NaN 1975-01-04 12:00:00 2025-11-01 06:00:00     94091
+     lat    number       100.0        100.0                 7.0                70.7      5417
+     lon    number       100.0        100.0              -136.9                13.5      9558
+ vmax_ms    number       100.0        100.0               5.144              84.883       805
+ pmin_mb    number        93.7         93.7               882.0              1024.0      2360
+  status text/date       100.0          NaN                  DB                  WV         9
+ rmax_km    number       100.0        100.0                16.7               120.7       947
+
+=== county_year.csv: 158,559 rows x 28 columns; one row = one county x one year (1975-2025): storm hits + damage summed over that year's storms
+    rows in labeled years (damage known): 57%
+                  column      type  pct_filled  pct_nonzero         min                 max  n_unique
+                    fips text/date       100.0          NaN       01001               56045      3109
+                   state text/date       100.0          NaN          AL                  WY        49
+             county_name text/date       100.0          NaN   Abbeville             Ziebach      1805
+                    year    number       100.0        100.0        1975                2025        51
+              has_labels    yes/no       100.0          NaN       False                True         2
+              population    number        49.0         49.0        43.0          10125014.0     53386
+           housing_units    number        49.0         49.0        34.0           3708352.0     40554
+      bldg_value_usd2023    number        49.0         49.0  54628596.0     1684638268415.0     75724
+      farm_value_usd2023    number        49.0         48.4         0.0        7284687955.0     64301
+      crop_value_usd2023    number        49.0         48.1         0.0        5644799707.0     63595
+    forest_value_usd2023    number        49.0         38.1         0.0          18438569.0     36415
+          cropland_acres    number        49.0         48.4         0.0           1481908.0     56141
+          woodland_acres    number        49.0         47.9         0.0            731237.0     37047
+             max_wind_ms    number       100.0         47.0         0.0               69.45      3158
+           hurricane_hit    yes/no       100.0          NaN       False                True         2
+                  ts_hit    yes/no       100.0          NaN       False                True         2
+          n_storms_500km    number       100.0         47.0           0                  10        11
+       n_storms_ts_force    number       100.0          7.1           0                   5         6
+n_storms_hurricane_force    number       100.0          0.5           0                   3         4
+         p_hurricane_hit    number       100.0         12.6         0.0               0.216        12
+                p_ts_hit    number       100.0         53.6         0.0               0.628        33
+  mean_hurricanes_per_yr    number       100.0         12.6         0.0               0.216        11
+        prop_dmg_usd2023    number        56.9          3.3         0.0  33871314741.040001      4089
+        crop_dmg_usd2023    number        56.9          0.6         0.0       917504080.251       797
+       total_dmg_usd2023    number        56.9          3.3         0.0  33871314741.040001      4167
+           deaths_direct    number        56.9          0.3         0.0             622.908       255
+         injuries_direct    number        56.9          0.2         0.0             695.717       213
+        pop_loss_usd2023    number        56.9          0.5         0.0      8533837780.852       434
+
+=== county_stats_by_year.csv: 77,725 rows x 14 columns; one row = one county x one year (2000-2024): exposure stats
+                   column      type  pct_filled  pct_nonzero         min              max  n_unique
+                     fips text/date       100.0          NaN       01001            56045      3109
+                    state text/date       100.0          NaN          AL               WY        49
+              county_name text/date       100.0          NaN   Abbeville          Ziebach      1805
+                     year    number       100.0        100.0        2000             2024        25
+               population    number       100.0        100.0          43         10125014     53386
+            housing_units    number       100.0        100.0          34          3708352     40554
+         density_per_sqmi    number       100.0        100.0        0.06         49778.72     26445
+       bldg_value_usd2023    number       100.0        100.0  54628596.0  1684638268415.0     75724
+       farm_value_usd2023    number       100.0         98.7         0.0     7284687955.0     64301
+       crop_value_usd2023    number       100.0         98.1         0.0     5644799707.0     63595
+     forest_value_usd2023    number       100.0         77.8         0.0       18438569.0     36415
+farm_timber_value_usd2023    number       100.0         98.7         0.0     7284887879.0     64345
+           cropland_acres    number       100.0         98.7         0.0        1481908.0     56141
+           woodland_acres    number       100.0         97.8         0.0         731237.0     37047

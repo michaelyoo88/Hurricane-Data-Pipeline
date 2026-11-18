@@ -1,0 +1,5 @@
+model,rule,cutoff,true_pos,false_pos,false_neg,true_neg,precision,recall,accuracy,roc_auc,pr_auc
+"Logistic, 4 inputs + latitude (current)",default 0.5,0.5,1365,1210,4151,90453,0.5301,0.2475,0.9448,0.9198,0.4214
+"Logistic, 4 inputs + latitude (current)",flag as many as really damaged,0.2649,2404,3112,3112,88551,0.4358,0.4358,0.936,0.9198,0.4214
+"XGBoost, 11 inputs (hybrid)",default 0.5,0.5,1891,1637,3625,90026,0.536,0.3428,0.9459,0.9319,0.462
+"XGBoost, 11 inputs (hybrid)",flag as many as really damaged,0.3623,2623,2893,2893,88770,0.4755,0.4755,0.9405,0.9319,0.462

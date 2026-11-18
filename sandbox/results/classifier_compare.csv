@@ -1,0 +1,7 @@
+model,roc_auc,pr_auc,brier,log_loss,calibration,roc_auc_strong_wind,calib_strong_wind
+"Logistic regression, J2 (current)",0.9166,0.4125,0.0419,0.1474,1.0009,0.5632,1.207
+"Logistic regression, rich",0.9267,0.4537,0.0403,0.1398,1.0083,0.6323,1.2215
+"Random forest, J2",0.915,0.418,0.0407,0.1414,1.006,0.5973,1.0121
+"Random forest, rich",0.9311,0.4711,0.0383,0.1302,1.0427,0.647,0.9769
+"XGBoost, J2",0.9193,0.4247,0.0404,0.1381,1.0042,0.6067,1.0116
+"XGBoost, rich",0.9309,0.4557,0.0391,0.1323,0.9972,0.6528,0.9502

@@ -1,0 +1,13 @@
+,0
+rank_corr_property_all,0.9462975467591777
+rank_corr_total_all,0.9382463509377171
+rank_corr_property_high,0.7461610880987347
+high_risk_counties,628.0
+within_3x_property_high,0.589171974522293
+typical_gap_x_property_high,2.4012049962635635
+median_ratio_property_high,0.5679857610694625
+ours_over_fema_coastal_property,1.1860644316995659
+ours_over_fema_inland_property,0.7412310760777174
+coastal_share_ours_property,0.9053975753782196
+coastal_share_fema_property,0.8567564752262276
+y4_over_k12_property_total,0.9928339390142729

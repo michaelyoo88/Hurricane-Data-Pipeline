@@ -1,0 +1,8 @@
+region,property_eal_usd,fema_property,crop_eal_usd,fema_crop,total_eal_usd,fema_total,ratio_total,ratio_property
+Florida,7.037,3.748,0.606,0.095,7.802,4.104,1.901,1.877
+Southeast Atlantic: GA-SC-NC,0.923,2.576,0.214,0.171,1.233,2.886,0.427,0.358
+Gulf: TX-LA,2.975,2.506,0.082,0.041,3.161,2.707,1.168,1.187
+Mid-Atlantic: VA-NY,0.55,0.87,0.01,0.077,0.771,0.977,0.789,0.633
+Gulf: MS-AL,0.564,0.658,0.055,0.033,0.647,0.732,0.885,0.856
+New England,0.075,0.474,0.0,0.013,0.129,0.503,0.257,0.159
+Inland / other,0.062,0.026,0.003,0.008,0.122,0.034,3.584,2.424

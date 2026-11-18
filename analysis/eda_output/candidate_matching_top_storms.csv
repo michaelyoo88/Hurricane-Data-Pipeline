@@ -1,0 +1,26 @@
+candidate,storm,prop_B,crop_B,deaths
+Flash Flood,HARVEY 2017,53.77,0.0,66.0
+Flash Flood,FLOYD 1999,1.3,0.1,40.0
+Flash Flood,IDA 2021,1.17,0.02,53.0
+Flash Flood,IMELDA 2019,0.68,0.0,2.0
+Flash Flood,IRENE 2011,0.44,0.02,9.0
+Flood,IRENE 2011,2.52,0.02,9.0
+Flood,IAN 2022,1.09,0.0,5.0
+Flood,IRMA 2017,0.64,0.0,0.0
+Flood,MATTHEW 2016,0.39,0.14,7.0
+Flood,MILTON 2024,0.29,0.0,0.0
+Heavy Rain,FLOYD 1999,0.0,0.0,0.0
+Heavy Rain,CINDY 2005,0.0,0.0,0.0
+Heavy Rain,DENNIS 2005,0.0,0.0,0.0
+Heavy Rain,EARL 1998,0.0,0.0,0.0
+Heavy Rain,FIVE 2010,0.0,0.0,0.0
+High/Strong Wind,SANDY 2012,5.32,0.0,28.0
+High/Strong Wind,CHARLEY 2004,3.6,0.28,5.0
+High/Strong Wind,JEANNE 2004,1.26,0.08,1.0
+High/Strong Wind,FRANCES 2004,0.25,0.14,0.0
+High/Strong Wind,IVAN 2004,0.14,0.0,1.0
+Tornado,MILTON 2024,0.66,0.0,6.0
+Tornado,IVAN 2004,0.13,0.0,6.0
+Tornado,CINDY 2005,0.12,0.0,0.0
+Tornado,LEE 2011,0.03,0.0,0.0
+Tornado,ISAIAS 2020,0.02,0.0,2.0

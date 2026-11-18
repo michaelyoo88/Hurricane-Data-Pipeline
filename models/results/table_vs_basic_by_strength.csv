@@ -1,0 +1,37 @@
+strength,storms,recorded_B,predicted_B,pred_over_recorded,typical_storm_factor,category,model
+Cat 1-2,32.0,100.473,88.344,0.879,6.014,property,basic_two_part
+Cat 3+,15.0,298.352,92.456,0.31,0.689,property,basic_two_part
+TD / TS,147.0,11.654,24.595,2.11,68.487,property,basic_two_part
+Cat 1-2,32.0,3.73,3.177,0.852,1.76,crop,basic_two_part
+Cat 3+,15.0,12.408,12.689,1.023,3.672,crop,basic_two_part
+TD / TS,147.0,0.145,0.545,3.766,2.843,crop,basic_two_part
+Cat 1-2,32.0,3.902,5.083,1.303,1.96,people,basic_two_part
+Cat 3+,15.0,20.068,7.778,0.388,1.292,people,basic_two_part
+TD / TS,147.0,1.11,2.534,2.283,1.319,people,basic_two_part
+Cat 1-2,32.0,108.105,96.604,0.894,4.015,total,basic_two_part
+Cat 3+,15.0,330.828,112.923,0.341,0.68,total,basic_two_part
+TD / TS,147.0,12.909,27.673,2.144,33.755,total,basic_two_part
+Cat 1-2,32.0,100.473,156.381,1.556,8.386,property,table_dollar
+Cat 3+,15.0,298.352,192.159,0.644,0.915,property,table_dollar
+TD / TS,147.0,11.654,47.429,4.07,112.65,property,table_dollar
+Cat 1-2,32.0,3.73,5.234,1.403,2.264,crop,table_dollar
+Cat 3+,15.0,12.408,8.534,0.688,2.158,crop,table_dollar
+TD / TS,147.0,0.145,1.331,9.207,7.252,crop,table_dollar
+Cat 1-2,32.0,3.902,13.032,3.34,2.769,people,table_dollar
+Cat 3+,15.0,20.068,8.718,0.434,1.983,people,table_dollar
+TD / TS,147.0,1.11,3.236,2.916,1.869,people,table_dollar
+Cat 1-2,32.0,108.105,174.646,1.616,6.987,total,table_dollar
+Cat 3+,15.0,330.828,209.411,0.633,0.792,total,table_dollar
+TD / TS,147.0,12.909,51.997,4.028,47.636,total,table_dollar
+Cat 1-2,32.0,100.473,251.473,2.503,10.459,property,table_storm_avg
+Cat 3+,15.0,298.352,320.284,1.074,1.498,property,table_storm_avg
+TD / TS,147.0,11.654,43.661,3.746,117.852,property,table_storm_avg
+Cat 1-2,32.0,3.73,8.348,2.238,3.547,crop,table_storm_avg
+Cat 3+,15.0,12.408,19.276,1.554,4.479,crop,table_storm_avg
+TD / TS,147.0,0.145,1.879,12.992,7.585,crop,table_storm_avg
+Cat 1-2,32.0,3.902,10.116,2.592,2.14,people,table_storm_avg
+Cat 3+,15.0,20.068,8.267,0.412,1.783,people,table_storm_avg
+TD / TS,147.0,1.11,2.264,2.04,1.556,people,table_storm_avg
+Cat 1-2,32.0,108.105,269.937,2.497,7.483,total,table_storm_avg
+Cat 3+,15.0,330.828,347.827,1.051,1.488,total,table_storm_avg
+TD / TS,147.0,12.909,47.804,3.703,52.644,total,table_storm_avg

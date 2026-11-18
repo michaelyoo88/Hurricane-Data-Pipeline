@@ -1,0 +1,124 @@
+table,column,type,pct_filled,pct_nonzero,min,max,n_unique,unit,description,source
+storm_county,storm_id,text/date,100.0,,AL011976,AL292020,374,,"Storm id: basin + number + year, e.g. AL092022 = Ian",NOAA HURDAT2
+storm_county,fips,text/date,100.0,,01001,55141,2671,,"5-digit county code, stored as text so the leading zero stays",FEMA NRI
+storm_county,year,number,100.0,100.0,1975,2025,51,,Hurricane season year,NOAA HURDAT2
+storm_county,month,number,100.0,100.0,1,12,9,,Month of closest approach,NOAA HURDAT2
+storm_county,has_labels,yes/no,100.0,,False,True,2,,"True for 1996-2024, the years with damage records; damage is blank when False",derived
+storm_county,min_dist_km,number,100.0,100.0,0.2,500.0,4998,km,Closest distance from storm center to the county's population center,derived
+storm_county,vmax_at_min_ms,number,100.0,100.0,5.14,77.17,388,m/s,Storm's max sustained wind at closest approach,NOAA HURDAT2
+storm_county,rmax_km_at_min,number,100.0,100.0,21.1,92.9,644,km,"Storm size (radius of max wind, Willoughby 2006) at closest approach",derived
+storm_county,wind_est_ms,number,100.0,100.0,3.62,69.45,3187,m/s,"Estimated peak wind at the county: strongest over all hours (Rankine vortex, Willoughby size)",derived
+storm_county,hours_ts_force,number,100.0,8.3,0,83,79,hours,Hours with estimated wind at the county >= 17.5 m/s (tropical-storm force),derived
+storm_county,hours_hurricane_force,number,100.0,0.5,0,42,19,hours,Hours with estimated wind at the county >= 32.9 m/s (hurricane force),derived
+storm_county,wind_exposure,number,100.0,8.2,0.0,1147.7,1780,m/s-hours,"Estimated wind above 17.5 m/s, summed over all hours: strength x duration",derived
+storm_county,hours_within_100km,number,100.0,14.7,0,77,69,hours,Hours the storm center spent within 100 km,derived
+storm_county,time_at_min_utc,text/date,100.0,,1975-06-27 00:00:00,2025-09-30 06:00:00,14151,UTC,Time of closest approach,NOAA HURDAT2
+storm_county,enter_500km_utc,text/date,100.0,,1975-06-27 00:00:00,2025-09-30 05:00:00,19997,UTC,First hour within 500 km,NOAA HURDAT2
+storm_county,exit_500km_utc,text/date,100.0,,1975-06-27 09:00:00,2025-09-30 19:00:00,14250,UTC,Last hour within 500 km,NOAA HURDAT2
+storm_county,prop_dmg_usd2023,number,65.1,3.8,0.0,33843698795.754,4887,USD (2023),"Recorded property damage, all matched record types: hurricane/TS/TD + surge, coastal flood, flood, flash flood, high/strong wind, tornado",NY Fed Losses from Natural Disasters
+storm_county,crop_dmg_usd2023,number,65.1,0.6,0.0,912031888.918,912,USD (2023),Recorded crop damage (includes timber),NY Fed Losses from Natural Disasters
+storm_county,crop_dmg_area_usd2023,number,65.1,0.6,0.0,897281696.989,912,USD (2023),Crop damage split by land area instead of housing (sensitivity check),NY Fed Losses from Natural Disasters
+storm_county,injuries_direct,number,65.1,0.2,0.0,695.717,220,people,Direct injuries (can be fractional: zone totals split across counties),NY Fed Losses from Natural Disasters
+storm_county,injuries_indirect,number,65.1,0.0,0.0,2400.376,18,people,Indirect injuries,NY Fed Losses from Natural Disasters
+storm_county,deaths_direct,number,65.1,0.3,0.0,622.908,260,people,Direct deaths (can be fractional),NY Fed Losses from Natural Disasters
+storm_county,deaths_indirect,number,65.1,0.1,0.0,21.0,48,people,Indirect deaths,NY Fed Losses from Natural Disasters
+storm_county,n_loss_records,number,65.1,7.2,0.0,29.0,27,count,Damage records added up into this row,derived
+storm_county,n_ambiguous_records,number,65.1,0.1,0.0,5.0,6,count,"Of those, records where another storm also qualified",derived
+storm_county,prop_dmg_other_wind_usd2023,number,65.1,0.7,0.0,2322572179.716,1020,USD (2023),Part of prop_dmg_usd2023 from high wind / strong wind records,NY Fed Losses from Natural Disasters
+storm_county,prop_dmg_rain_usd2023,number,65.1,0.9,0.0,12430719133.42,1009,USD (2023),Part of prop_dmg_usd2023 from flood / flash flood records (rain-driven),NY Fed Losses from Natural Disasters
+storm_county,prop_dmg_surge_usd2023,number,65.1,0.2,0.0,27819600278.994,332,USD (2023),Part of prop_dmg_usd2023 from storm surge / coastal flood records,NY Fed Losses from Natural Disasters
+storm_county,prop_dmg_tornado_usd2023,number,65.1,0.3,0.0,483234390.914,331,USD (2023),Part of prop_dmg_usd2023 from tornado records,NY Fed Losses from Natural Disasters
+storm_county,crop_dmg_extra_usd2023,number,65.1,0.2,0.0,365826513.257,322,USD (2023),Part of crop_dmg_usd2023 from the extra record types (not hurricane/TS/TD),NY Fed Losses from Natural Disasters
+storm_county,deaths_direct_extra,number,65.1,0.1,0.0,36.0,69,people,Part of deaths_direct from the extra record types,NY Fed Losses from Natural Disasters
+storm_county,n_extra_records,number,65.1,3.1,0.0,27.0,24,count,"Of the damage records, how many are extra types (surge, flood, other wind, tornado)",derived
+storms,storm_id,text/date,100.0,,AL011976,AL312020,839,,"Storm id: basin + number + year, e.g. AL092022 = Ian",NOAA HURDAT2
+storms,name,text/date,100.0,,ALBERTO,ZETA,236,,Storm name,NOAA HURDAT2
+storms,year,number,100.0,100.0,1975,2025,51,,Hurricane season year,NOAA HURDAT2
+storms,start_utc,text/date,100.0,,1975-01-04 12:00:00,2025-10-21 06:00:00,829,UTC,First reading,NOAA HURDAT2
+storms,end_utc,text/date,100.0,,1975-01-09 00:00:00,2025-11-01 06:00:00,829,UTC,Last reading,NOAA HURDAT2
+storms,peak_vmax_ms,number,100.0,100.0,12.86,84.88,29,m/s,Strongest wind in the storm's life,NOAA HURDAT2
+storms,min_pmin_mb,number,87.8,87.8,882.0,1016.0,110,mb,Lowest central pressure,NOAA HURDAT2
+storms,peak_category,text/date,100.0,,1,TS,7,,"Saffir-Simpson category at peak (TD, TS, 1-5)",derived
+storms,n_counties_500km,number,100.0,44.6,0,1733,294,count,Counties reached within 500 km,derived
+storms,n_counties_100km,number,100.0,28.7,0,395,150,count,Counties reached within 100 km,derived
+storms,closest_county_km,number,44.6,44.6,0.2,499.4,249,km,Closest approach to any county; blank = never within 500 km,derived
+storms,obs_prop_dmg_usd2023,number,59.6,16.3,0.0,115843922770.183,138,USD (2023),Total recorded property damage,NY Fed Losses from Natural Disasters
+storms,obs_crop_dmg_usd2023,number,59.6,8.1,0.0,5324729383.695,69,USD (2023),Total recorded crop damage,NY Fed Losses from Natural Disasters
+storms,obs_deaths_direct,number,59.6,8.7,0.0,1004.0,34,people,Total recorded direct deaths,NY Fed Losses from Natural Disasters
+storms,has_labels,yes/no,100.0,,False,True,2,,"True for 1996-2024, the years with damage records; damage is blank when False",derived
+counties,fips,text/date,100.0,,01001,56045,3109,,"5-digit county code, stored as text so the leading zero stays",FEMA NRI
+counties,state,text/date,100.0,,AL,WY,49,,State abbreviation,FEMA NRI
+counties,county_name,text/date,100.0,,Abbeville,Ziebach,1805,,County name (Connecticut: 2022 planning regions),FEMA NRI
+counties,pop_lat,number,100.0,100.0,24.747,48.873,3109,degrees,Latitude of the county's 2020 center of population,Census
+counties,pop_lon,number,100.0,100.0,-124.328,-67.466,3109,degrees,Longitude of the county's 2020 center of population,Census
+counties,population,number,100.0,100.0,64,10005712,3045,people,2020 population,FEMA NRI
+counties,bldg_value_usd2023,number,100.0,100.0,54628595.673,1634520040068.978,3109,USD (2023),Total building value (exposure),FEMA NRI
+counties,ag_value_usd2023,number,100.0,98.6,0.0,7093757415.601,3068,USD (2023),Agriculture value (exposure; excludes timber),FEMA NRI
+counties,area_sqmi,number,100.0,100.0,2.067,20308.295,3109,sq mi,Land area,FEMA NRI
+counties,density_per_sqmi,number,100.0,100.0,0.09,49520.81,2771,people/sq mi,Population / area,derived
+counties,coastal,yes/no,100.0,,False,True,2,,True if FEMA gives the county any coastal flooding loss,FEMA NRI
+counties,nri_hrcn_n_events,number,76.9,62.5,0.0,196.0,132,count,FEMA: recorded hurricane events,FEMA NRI
+counties,nri_hrcn_afreq,number,76.9,72.9,0.0,0.459,2054,events/yr,FEMA: hurricane annualized frequency,FEMA NRI
+counties,nri_hrcn_exp_bldg_usd2023,number,76.9,76.9,54628595.673,1634520040068.978,2392,USD (2023),FEMA: building value exposed to hurricanes,FEMA NRI
+counties,nri_hrcn_exp_pop,number,76.9,76.9,64.0,10005712.0,2382,people,FEMA: population exposed,FEMA NRI
+counties,nri_hrcn_exp_ag_usd2023,number,76.9,75.7,0.0,2289347177.397,2353,USD (2023),FEMA: agriculture value exposed,FEMA NRI
+counties,nri_hrcn_hlr_bldg,number,76.9,71.6,0.0,0.014,1962,fraction,"FEMA: historic loss ratio, buildings",FEMA NRI
+counties,nri_hrcn_hlr_pop,number,76.9,71.4,0.0,0.0,1430,fraction,"FEMA: historic loss ratio, population",FEMA NRI
+counties,nri_hrcn_hlr_ag,number,76.9,71.6,0.0,0.045,1936,fraction,"FEMA: historic loss ratio, agriculture",FEMA NRI
+counties,nri_hrcn_eal_bldg_usd2023,number,76.9,71.6,0.0,410659660.561,2226,USD (2023)/yr,"FEMA: expected annual loss, buildings",FEMA NRI
+counties,nri_hrcn_eal_pop,number,76.9,71.4,0.0,2.138,2221,people/yr,FEMA: expected annual deaths (10 injuries = 1),FEMA NRI
+counties,nri_hrcn_eal_pope_usd2023,number,76.9,71.4,0.0,28107219.13,2221,USD (2023)/yr,FEMA: expected annual population loss in dollars,FEMA NRI
+counties,nri_hrcn_eal_ag_usd2023,number,76.9,70.3,0.0,15870118.278,2186,USD (2023)/yr,"FEMA: expected annual loss, agriculture",FEMA NRI
+counties,nri_hrcn_eal_total_usd2023,number,76.9,71.6,0.0,439261138.779,2226,USD (2023)/yr,FEMA: total hurricane expected annual loss (the benchmark),FEMA NRI
+counties,nri_hrcn_eal_score,number,76.9,71.6,0.0,100.0,2226,percentile,FEMA: national percentile of hurricane EAL,FEMA NRI
+counties,nri_hrcn_eal_rating,text/date,100.0,,No Expected Annual Losses,Very Low,7,,FEMA: hurricane EAL rating (Very Low to Very High),FEMA NRI
+storm_tracks,storm_id,text/date,100.0,,AL011976,AL312020,839,,"Storm id: basin + number + year, e.g. AL092022 = Ian",NOAA HURDAT2
+storm_tracks,time_utc,text/date,100.0,,1975-01-04 12:00:00,2025-11-01 06:00:00,94091,UTC,Hour (interpolated between 6-hourly readings),NOAA HURDAT2
+storm_tracks,lat,number,100.0,100.0,7.0,70.7,5417,degrees,Storm center latitude,NOAA HURDAT2
+storm_tracks,lon,number,100.0,100.0,-136.9,13.5,9558,degrees,Storm center longitude (west is negative),NOAA HURDAT2
+storm_tracks,vmax_ms,number,100.0,100.0,5.144,84.883,805,m/s,Max sustained wind,NOAA HURDAT2
+storm_tracks,pmin_mb,number,93.7,93.7,882.0,1024.0,2360,mb,Central pressure (blank where never recorded),NOAA HURDAT2
+storm_tracks,status,text/date,100.0,,DB,WV,9,,"Storm type: HU hurricane, TS tropical storm, TD depression, EX extratropical",NOAA HURDAT2
+storm_tracks,rmax_km,number,100.0,100.0,16.7,120.7,947,km,Storm size: radius of max wind from the Willoughby (2006) formula,derived
+county_year,fips,text/date,100.0,,01001,56045,3109,,"5-digit county code, stored as text so the leading zero stays",FEMA NRI
+county_year,state,text/date,100.0,,AL,WY,49,,State abbreviation,FEMA NRI
+county_year,county_name,text/date,100.0,,Abbeville,Ziebach,1805,,County name (Connecticut: 2022 planning regions),FEMA NRI
+county_year,year,number,100.0,100.0,1975,2025,51,,Hurricane season year,NOAA HURDAT2
+county_year,has_labels,yes/no,100.0,,False,True,2,,"True for 1996-2024, the years with damage records; damage is blank when False",derived
+county_year,population,number,49.0,49.0,43.0,10125014.0,53386,people,"Resident population that year (Census estimates, July 1); blank before 2000",Census population estimates
+county_year,housing_units,number,49.0,49.0,34.0,3708352.0,40554,units,"Housing units that year (Census estimates, July 1); blank before 2000",Census housing unit estimates
+county_year,bldg_value_usd2023,number,49.0,49.0,54628596.0,1684638268415.0,75724,USD (2023),Building value that year = FEMA value per 2020 housing unit x that year's housing units; blank before 2000,derived from FEMA NRI + Census
+county_year,farm_value_usd2023,number,49.0,48.4,0.0,7284687955.0,64301,USD (2023),"Farm sales that year, crops + livestock (USDA census every 5 yrs, straight line between); blank before 2000",USDA Census of Agriculture
+county_year,crop_value_usd2023,number,49.0,48.1,0.0,5644799707.0,63595,USD (2023),Crop sales that year (same method); blank before 2000,USDA Census of Agriculture
+county_year,forest_value_usd2023,number,49.0,38.1,0.0,18438569.0,36415,USD (2023),Timber sold from farm woodland that year (same method; ~24% withheld and filled); blank before 2000,USDA Census of Agriculture
+county_year,cropland_acres,number,49.0,48.4,0.0,1481908.0,56141,acres,"Cropland on farms that year (x 4,046.86 = square meters); blank before 2000",USDA Census of Agriculture
+county_year,woodland_acres,number,49.0,47.9,0.0,731237.0,37047,acres,Woodland on farms that year; blank before 2000,USDA Census of Agriculture
+county_year,max_wind_ms,number,100.0,47.0,0.0,69.45,3158,m/s,Strongest estimated wind from any storm that year; 0 if none within 500 km,derived
+county_year,hurricane_hit,yes/no,100.0,,False,True,2,,max_wind_ms >= 32.9 m/s (64 kt),derived
+county_year,ts_hit,yes/no,100.0,,False,True,2,,max_wind_ms >= 17.5 m/s (34 kt),derived
+county_year,n_storms_500km,number,100.0,47.0,0,10,11,count,Storms that passed within 500 km,derived
+county_year,n_storms_ts_force,number,100.0,7.1,0,5,6,count,Storms bringing tropical-storm-force wind,derived
+county_year,n_storms_hurricane_force,number,100.0,0.5,0,3,4,count,Storms bringing hurricane-force wind,derived
+county_year,p_hurricane_hit,number,100.0,12.6,0.0,0.216,12,probability,Share of 1975-2025 years with a hurricane-force hit (same every year),derived
+county_year,p_ts_hit,number,100.0,53.6,0.0,0.628,33,probability,Share of years with tropical-storm-force wind,derived
+county_year,mean_hurricanes_per_yr,number,100.0,12.6,0.0,0.216,11,storms/yr,Average hurricane-force storms per year,derived
+county_year,prop_dmg_usd2023,number,56.9,3.3,0.0,33871314741.04,4089,USD (2023),Recorded property damage that year,NY Fed Losses from Natural Disasters
+county_year,crop_dmg_usd2023,number,56.9,0.6,0.0,917504080.251,797,USD (2023),Recorded crop damage that year,NY Fed Losses from Natural Disasters
+county_year,total_dmg_usd2023,number,56.9,3.3,0.0,33871314741.04,4167,USD (2023),Property + crop damage,NY Fed Losses from Natural Disasters
+county_year,deaths_direct,number,56.9,0.3,0.0,622.908,255,people,Recorded direct deaths that year,NY Fed Losses from Natural Disasters
+county_year,injuries_direct,number,56.9,0.2,0.0,695.717,213,people,Recorded direct injuries that year,NY Fed Losses from Natural Disasters
+county_year,pop_loss_usd2023,number,56.9,0.5,0.0,8533837780.852,434,USD,(deaths + injuries/10) x $13.7M (FEMA's value of a life),derived
+county_stats_by_year,fips,text/date,100.0,,01001,56045,3109,,"5-digit county code, stored as text so the leading zero stays",FEMA NRI
+county_stats_by_year,state,text/date,100.0,,AL,WY,49,,State abbreviation,FEMA NRI
+county_stats_by_year,county_name,text/date,100.0,,Abbeville,Ziebach,1805,,County name (Connecticut: 2022 planning regions),FEMA NRI
+county_stats_by_year,year,number,100.0,100.0,2000,2024,25,,Hurricane season year,NOAA HURDAT2
+county_stats_by_year,population,number,100.0,100.0,43,10125014,53386,people,"Resident population that year (Census estimates, July 1)",Census population estimates
+county_stats_by_year,housing_units,number,100.0,100.0,34,3708352,40554,units,"Housing units that year (Census estimates, July 1)",Census housing unit estimates
+county_stats_by_year,density_per_sqmi,number,100.0,100.0,0.06,49778.72,26445,people/sq mi,That year's population / land area,derived
+county_stats_by_year,bldg_value_usd2023,number,100.0,100.0,54628596.0,1684638268415.0,75724,USD (2023),"Building value that year (all buildings, not just homes) = FEMA value per 2020 housing unit x that year's housing units",derived from FEMA NRI + Census
+county_stats_by_year,farm_value_usd2023,number,100.0,98.7,0.0,7284687955.0,64301,USD (2023),"Farm sales that year, crops + livestock (USDA census every 5 yrs, straight line between)",USDA Census of Agriculture
+county_stats_by_year,crop_value_usd2023,number,100.0,98.1,0.0,5644799707.0,63595,USD (2023),Crop sales that year (same method),USDA Census of Agriculture
+county_stats_by_year,forest_value_usd2023,number,100.0,77.8,0.0,18438569.0,36415,USD (2023),Timber sold from farm woodland that year (same method; ~24% withheld and filled),USDA Census of Agriculture
+county_stats_by_year,farm_timber_value_usd2023,number,100.0,98.7,0.0,7284887879.0,64345,USD (2023),Farm sales + timber sales: exposure weight for the crop model,derived
+county_stats_by_year,cropland_acres,number,100.0,98.7,0.0,1481908.0,56141,acres,Cropland on farms that year,USDA Census of Agriculture
+county_stats_by_year,woodland_acres,number,100.0,97.8,0.0,731237.0,37047,acres,Woodland on farms that year,USDA Census of Agriculture

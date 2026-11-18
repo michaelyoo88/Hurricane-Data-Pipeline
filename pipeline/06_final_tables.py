@@ -33,8 +33,8 @@ fact.insert(4, "has_labels", has_labels(fact.year))
 fact.loc[fact.has_labels, DAMAGE] = fact.loc[fact.has_labels, DAMAGE].fillna(0)
 fact.loc[~fact.has_labels, DAMAGE] = np.nan
 fact = fact.rename(columns={"prop_dmg_2023": "prop_dmg_usd2023", "crop_dmg_2023": "crop_dmg_usd2023",
-                            "crop_dmg_area_2023": "crop_dmg_area_usd2023",
-                            "prop_dmg_surge_2023": "prop_dmg_surge_usd2023"})
+                            "crop_dmg_area_2023": "crop_dmg_area_usd2023"})
+fact = fact.rename(columns=lambda c: c.replace("_2023", "_usd2023") if c.endswith("_2023") else c)
 
 # ---- storms: one row per storm ----
 g = tracks_6h.groupby("storm_id")
@@ -65,7 +65,9 @@ storms = storms.sort_values("start_utc")
 assert counties.fips.is_unique and storms.storm_id.is_unique
 assert not fact.duplicated(["storm_id", "fips"]).any()
 assert fact.fips.isin(counties.fips).all() and fact.storm_id.isin(storms.storm_id).all()
-assert np.isclose(fact.prop_dmg_usd2023.sum(), losses.prop_dmg_2023.sum())
+# every matched dollar in a labeled year lands in the table (2025 matches are left blank on purpose)
+labeled = losses.merge(storm_county[["storm_id", "fips", "year"]], on=["storm_id", "fips"]).year.pipe(has_labels)
+assert np.isclose(fact.prop_dmg_usd2023.sum(), losses.prop_dmg_2023[labeled.to_numpy()].sum())
 
 fact.to_csv(FINAL / "storm_county.csv", index=False)
 storms.to_csv(FINAL / "storms.csv", index=False)

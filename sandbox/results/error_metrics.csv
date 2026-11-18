@@ -1,0 +1,7 @@
+level,units,recorded_total_B,predicted_total_B,MAE_$M,RMSE_$M,R2_dollars,R2_log10,mean_abs_log10_err,typical_miss_x,within_3x,rank_corr,note
+"storm x county, all rows",97179,410.479,310.35,5.231,181.919,0.118,-12.19,4.388,11.183,0.247,0.269,94% of rows are $0
+"storm x county, damaged rows only",5516,410.479,227.596,77.161,747.469,0.148,-0.026,1.296,11.183,0.247,0.432,"prediction = chance x size, so lower by design"
+storm totals,194,410.479,310.35,2012.42,9288.164,0.164,-0.386,3.579,19.94,0.227,0.855,194 storms
+county x year,40227,410.479,310.35,12.257,283.948,0.117,-6.023,4.433,12.523,0.233,0.372,annual loss
+county EAL (25-season average),2560,16.419,12.414,6.271,47.256,0.268,-0.27,2.444,10.495,0.228,0.767,same exposure basis as the records
+"county EAL, counties with recorded EAL >= $1M/yr",278,16.311,11.284,53.927,143.222,0.181,-0.291,0.659,4.313,0.378,0.608,278 counties

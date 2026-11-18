@@ -44,10 +44,22 @@ CT_OLD_COUNTIES = {"09001", "09003", "09005", "09007", "09009", "09011", "09013"
 
 # Which NY Fed damage records count as hurricane damage
 WIND_GROUP = "Hurricane/Tropical Storm"            # hurricane, tropical storm, tropical depression
-SURGE_TYPES = ["Storm Surge/Tide", "Coastal Flood"]  # water pushed ashore by the storm (added 2026-11-08)
-SURGE_MAX_KM = 200   # surge/coastal-flood records need a closer storm: within 200 km AND
-                     # tropical-storm wind at the county or the storm within NEAR_KM.
-                     # Inland/rain flooding is NOT included (no rainfall feature yet).
+# Other NOAA event types that also carry hurricane damage, and the "source" label each gets.
+# Chosen from analysis/surge_matching_eda.py and analysis/candidate_matching_eda.py.
+EXTRA_TYPES = {
+    "Storm Surge/Tide": "surge",      # added 2026-11-08: water pushed ashore by the storm
+    "Coastal Flood": "surge",
+    "Flood": "rain",                  # added 2026-11-09: rain-driven flooding (Irene 2011, Ian)
+    "Flash Flood": "rain",            #   (Harvey 2017 is ~90% of flash-flood $)
+    "High Wind": "other_wind",        # added 2026-11-09: hurricane wind filed under another name
+    "Strong Wind": "other_wind",      #   (Sandy 2012 post-tropical, Charley 2004)
+    "Tornado": "tornado",             # added 2026-11-09: tornadoes spawned in the storm's rainbands
+}                                     # Heavy Rain left out (~$0); Drought left out (long records overlap storms by chance)
+SURGE_TYPES = [t for t, s in EXTRA_TYPES.items() if s == "surge"]
+# Extra-type records need a closer storm than hurricane records (which only need 500 km):
+# storm within EXTRA_MAX_KM AND (tropical-storm wind at the county OR storm within NEAR_KM),
+# because these event types also happen with no hurricane around.
+EXTRA_MAX_KM = 400   # 200 -> 300 km (2026-11-09, adds Rita 2005 surge) -> 400 km (2026-11-09)
 
 # NY Fed splits each zone's damage across counties several ways; we use:
 PROPERTY_WEIGHT = "Housing"     # property and crop damage follow where houses are

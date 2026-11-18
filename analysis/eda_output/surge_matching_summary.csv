@@ -1,0 +1,18 @@
+group,rule,records_matched,pct_records,prop_B,pct_prop_dollars,change_vs_baseline_B,crop_M,deaths_direct,injuries_direct,storms_with_surge,pct_ambiguous,pct_off_season,biggest_gains_vs_baseline
+baseline,"baseline: 200 km, TS wind or <100 km, -1/+2 d",1077,12.1,116.7,97.6,0.0,0.0,75,1,81,0.0,0.0,
+distance,100 km,820,9.2,114.0,95.3,-2.7,0.0,33,1,74,0.0,0.0,
+distance,150 km,966,10.9,116.3,97.3,-0.4,0.0,72,1,77,0.0,0.0,
+distance,200 km (baseline),1077,12.1,116.7,97.6,0.0,0.0,75,1,81,0.0,0.0,
+distance,300 km,1185,13.4,117.3,98.1,0.6,0.0,75,1,81,0.0,0.0,RITA 2005 +$0.5B
+distance,400 km,1216,13.7,117.4,98.2,0.7,0.0,75,1,81,0.0,0.0,RITA 2005 +$0.6B
+distance,500 km,1216,13.7,117.4,98.2,0.7,0.0,75,1,81,0.0,0.0,RITA 2005 +$0.6B
+wind,wind >= 25.7 m/s or <100 km,856,9.7,114.9,96.1,-1.8,0.0,33,1,76,0.0,0.0,
+wind,wind >= 17.5 m/s or <100 km (baseline),1077,12.1,116.7,97.6,0.0,0.0,75,1,81,0.0,0.0,
+wind,wind >= 10 m/s or <100 km,1283,14.5,116.7,97.6,0.0,0.0,75,1,89,0.1,0.3,
+wind,wind >= 17.5 m/s only (no <100 km rule),951,10.7,116.7,97.6,-0.0,0.0,75,1,77,0.0,0.0,
+wind,no wind / proximity rule,1317,14.9,116.7,97.6,0.0,0.0,75,1,90,0.1,0.3,
+window,-0 / +1 days,1071,12.1,116.7,97.6,-0.0,0.0,75,1,80,0.0,0.0,
+window,-1 / +2 days (baseline),1077,12.1,116.7,97.6,0.0,0.0,75,1,81,0.0,0.0,
+window,-2 / +3 days,1084,12.2,116.7,97.6,0.0,0.0,75,1,82,0.0,0.0,
+window,-3 / +4 days,1098,12.4,116.7,97.6,0.0,0.0,75,1,82,0.1,0.0,
+loosest,"500 km, no wind rule, -2/+3 d",2407,27.1,118.4,99.0,1.7,1.0,76,8,112,0.9,0.8,"RITA 2005 +$0.7B, IKE 2008 +$0.5B, HERMINE 2016 +$0.2B"

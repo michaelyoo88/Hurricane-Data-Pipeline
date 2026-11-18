@@ -1,0 +1,4 @@
+cluster,counties,density,value_per_person_k,coastal_share,farm_share_pct,strong_wind_hits,recording_rate,median_pct_lost_when_damaged,property_B
+0,808,20.6139,285.3904,0.005,4.264,189,0.4762,0.0376,5.1949
+1,372,127.7719,201.1925,1.0,0.1948,1096,0.6332,0.0315,360.5587
+2,1380,79.0085,198.8487,0.0,0.5999,581,0.5267,0.0103,44.7254
